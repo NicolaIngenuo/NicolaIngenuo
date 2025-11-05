@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Tessere Abbonamento</title>
+
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        /* Reset e Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --success-color: #4CAF50;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #e0e0e0;
+            --bg-light: #f5f5f5;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card Sections */
+        .section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .form-group input[type="file"] {
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
+        }
+
+        .btn-secondary {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #757575;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* Tessera Preview */
+        .preview-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .card-preview {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        /* Formato Carta di Credito: 85.6mm x 53.98mm = 323.7px x 204.1px @ 96dpi */
+        .tessera {
+            width: 323.7px;
+            height: 204.1px;
+            position: relative;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            overflow: hidden;
+            background: white;
+        }
+
+        .tessera-fronte {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-color: var(--primary-color);
+        }
+
+        .tessera-numero {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Courier New', monospace;
+        }
+
+        .tessera-retro {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tessera-header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .tessera-header h3 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .tessera-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tessera-info p {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin: 4px 0;
+        }
+
+        .tessera-info strong {
+            color: var(--primary-dark);
+        }
+
+        .tessera-qr {
+            text-align: center;
+        }
+
+        .tessera-qr img {
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+        }
+
+        /* Sezione Ristampa */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .abbonamenti-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .abbonamento-card {
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .abbonamento-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .abbonamento-card.selected {
+            border-color: var(--success-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .abbonamento-card input[type="checkbox"] {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .abbonamento-info h4 {
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .abbonamento-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin: 4px 0;
+        }
+
+        .abbonamento-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .badge-attivo {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+        }
+
+        .badge-scaduto {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
+        }
+
+        /* Notifiche */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        .notification.info {
+            background: var(--primary-color);
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .loading-spinner.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner-text {
+            position: absolute;
+            color: white;
+            margin-top: 100px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Database Controls */
+        .database-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .file-info {
+            padding: 12px;
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .file-info strong {
+            color: var(--primary-color);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Hidden Elements for PDF Generation */
+        #pdf-workspace {
+            position: fixed;
+            left: -9999px;
+            top: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .main-content {
+                padding: 15px;
+                gap: 20px;
+            }
+
+            .section {
+                padding: 15px;
+            }
+
+            .tessera {
+                transform: scale(0.8);
+            }
+
+            .card-preview {
+                gap: 10px;
+            }
+
+            .abbonamenti-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scroll personalizzato */
+        .abbonamenti-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .abbonamenti-grid::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: 4px;
+        }
+
+        .abbonamenti-grid::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        .abbonamenti-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Database Section */
+        .database-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.05) 0%, rgba(33, 150, 243, 0.1) 100%);
+        }
+
+        /* Full Width Sections */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="container">
+        <div class="header">
+            <h1>🎫 Gestione Tessere Abbonamento</h1>
+            <p>Sistema professionale per creazione e stampa tessere formato carta di credito</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+
+            <!-- Database Section -->
+            <div class="section database-section">
+                <h2>📁 Database</h2>
+                <div id="database-info" class="file-info" style="display: none;">
+                    <strong>Database caricato:</strong> <span id="db-filename"></span> -
+                    <strong>Abbonamenti totali:</strong> <span id="db-count">0</span> -
+                    <strong>Prossimo ID:</strong> <span id="db-next-id">1</span>
+                </div>
+                <div class="database-controls">
+                    <button class="btn btn-primary" onclick="app.nuovoDatabase()">
+                        📝 Nuovo Database
+                    </button>
+                    <button class="btn btn-secondary" onclick="document.getElementById('db-file-input').click()">
+                        📂 Carica Database Esistente
+                    </button>
+                    <button class="btn btn-success" onclick="app.esportaDatabase()" id="btn-export" disabled>
+                        💾 Esporta Database
+                    </button>
+                    <input type="file" id="db-file-input" accept=".xlsx" style="display: none;" onchange="app.caricaDatabase(this.files[0])">
+                </div>
+            </div>
+
+            <!-- Nuovo Abbonamento -->
+            <div class="section">
+                <h2>➕ Nuovo Abbonamento</h2>
+
+                <div class="form-group">
+                    <label for="sfondo-input">Immagine di Sfondo (Fronte)</label>
+                    <input type="file" id="sfondo-input" accept="image/jpeg,image/png" onchange="app.caricaSfondo(this.files[0])">
+                </div>
+
+                <div class="form-group">
+                    <label for="nome-input">Nome *</label>
+                    <input type="text" id="nome-input" placeholder="Mario" oninput="app.aggiornaPreview()">
+                </div>
+
+                <div class="form-group">
+                    <label for="cognome-input">Cognome *</label>
+                    <input type="text" id="cognome-input" placeholder="Rossi" oninput="app.aggiornaPreview()">
+                </div>
+
+                <div class="form-group">
+                    <label for="data-emissione-input">Data Emissione</label>
+                    <input type="date" id="data-emissione-input" onchange="app.calcolaScadenza()">
+                </div>
+
+                <div class="form-group">
+                    <label for="data-scadenza-input">Data Scadenza</label>
+                    <input type="date" id="data-scadenza-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="qr-input">QR Code (Opzionale)</label>
+                    <input type="file" id="qr-input" accept="image/png,image/jpeg" onchange="app.caricaQR(this.files[0])">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="app.generaAbbonamento()" id="btn-genera">
+                        ✅ Genera e Salva Abbonamento
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.resetForm()">
+                        🔄 Reset
+                    </button>
+                </div>
+
+                <!-- Preview -->
+                <div id="preview-container" class="preview-container">
+                    <div class="preview-label">Anteprima Tessera</div>
+                    <div class="card-preview">
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 600;">FRONTE</p>
+                            <div class="tessera" id="preview-fronte">
+                                <div class="tessera-fronte" id="preview-fronte-content">
+                                    <div class="tessera-numero" id="preview-numero">0001</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 600;">RETRO</p>
+                            <div class="tessera" id="preview-retro">
+                                <div class="tessera-retro">
+                                    <div class="tessera-header">
+                                        <h3>ABBONAMENTO</h3>
+                                    </div>
+                                    <div class="tessera-info">
+                                        <p><strong>Nome:</strong> <span id="preview-nome-retro">-</span></p>
+                                        <p><strong>Cognome:</strong> <span id="preview-cognome-retro">-</span></p>
+                                        <p><strong>Valido fino al:</strong> <span id="preview-scadenza-retro">-</span></p>
+                                    </div>
+                                    <div class="tessera-qr" id="preview-qr-container" style="display: none;">
+                                        <img id="preview-qr-img" src="" alt="QR Code">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ristampa Abbonamenti -->
+            <div class="section full-width">
+                <h2>🖨️ Ristampa Abbonamenti</h2>
+
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="🔍 Cerca per nome, cognome o numero..." oninput="app.cercaAbbonamenti()">
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="app.stampaSelezionati()" id="btn-stampa" disabled>
+                        🖨️ Stampa Selezionati (<span id="count-selected">0</span>/4)
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.deselezionaTutti()">
+                        ❌ Deseleziona Tutti
+                    </button>
+                </div>
+
+                <div id="abbonamenti-grid" class="abbonamenti-grid">
+                    <p style="text-align: center; color: var(--text-secondary); padding: 40px;">
+                        Carica o crea un database per visualizzare gli abbonamenti
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div>
+            <div class="spinner"></div>
+            <div class="spinner-text" id="loading-text">Caricamento...</div>
+        </div>
+    </div>
+
+    <!-- PDF Workspace (Hidden) -->
+    <div id="pdf-workspace"></div>
+
+    <!-- JavaScript -->
+    <script>
+        // Classe principale per la gestione dell'applicazione
+        class AbbonamentoManager {
+            constructor() {
+                this.database = [];
+                this.prossimoID = 1;
+                this.nomeDatabase = 'database_abbonamenti.xlsx';
+                this.sfondoBase64 = null;
+                this.qrBase64 = null;
+                this.abbonamenti Selezionati = new Set();
+
+                // Inizializzazione
+                this.init();
+            }
+
+            // Inizializzazione dell'applicazione
+            init() {
+                console.log('Inizializzazione Gestione Tessere Abbonamento...');
+
+                // Imposta data emissione corrente
+                const oggi = new Date();
+                document.getElementById('data-emissione-input').valueAsDate = oggi;
+                this.calcolaScadenza();
+
+                // Tentativo di caricamento automatico database
+                this.tentaCaricamentoAutomatico();
+            }
+
+            // Mostra/Nascondi loading spinner
+            mostraLoading(mostra, testo = 'Caricamento...') {
+                const spinner = document.getElementById('loading-spinner');
+                const loadingText = document.getElementById('loading-text');
+
+                if (mostra) {
+                    loadingText.textContent = testo;
+                    spinner.classList.add('active');
+                } else {
+                    spinner.classList.remove('active');
+                }
+            }
+
+            // Sistema di notifiche
+            mostraNotifica(messaggio, tipo = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${tipo}`;
+                notification.textContent = messaggio;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.style.animation = 'slideIn 0.3s ease reverse';
+                    setTimeout(() => notification.remove(), 300);
+                }, 3000);
+            }
+
+            // Tentativo caricamento automatico database
+            async tentaCaricamentoAutomatico() {
+                // In ambiente browser, non possiamo accedere direttamente al filesystem
+                // Mostriamo un messaggio informativo
+                console.log('Per iniziare, crea un nuovo database o carica uno esistente.');
+                this.mostraNotifica('Benvenuto! Crea un nuovo database o caricane uno esistente.', 'info');
+            }
+
+            // Crea nuovo database
+            nuovoDatabase() {
+                try {
+                    this.database = [];
+                    this.prossimoID = 1;
+                    this.aggiornaInfoDatabase();
+                    this.aggiornaGrigliaAbbonamenti();
+                    this.mostraNotifica('Nuovo database creato con successo!', 'success');
+
+                    // Abilita pulsante esporta
+                    document.getElementById('btn-export').disabled = false;
+                } catch (error) {
+                    console.error('Errore creazione database:', error);
+                    this.mostraNotifica('Errore durante la creazione del database', 'error');
+                }
+            }
+
+            // Carica database da file
+            async caricaDatabase(file) {
+                if (!file) return;
+
+                this.mostraLoading(true, 'Caricamento database...');
+
+                try {
+                    const data = await this.leggiFileExcel(file);
+
+                    if (data && data.length > 0) {
+                        this.database = data;
+                        this.nomeDatabase = file.name;
+
+                        // Calcola prossimo ID
+                        const maxID = Math.max(...data.map(a => parseInt(a.ID_Progressivo) || 0), 0);
+                        this.prossimoID = maxID + 1;
+
+                        this.aggiornaInfoDatabase();
+                        this.aggiornaGrigliaAbbonamenti();
+                        this.mostraNotifica(`Database caricato: ${data.length} abbonamenti trovati`, 'success');
+
+                        // Abilita pulsante esporta
+                        document.getElementById('btn-export').disabled = false;
+                    } else {
+                        throw new Error('Database vuoto o formato non valido');
+                    }
+                } catch (error) {
+                    console.error('Errore caricamento database:', error);
+                    this.mostraNotifica('Errore durante il caricamento del database: ' + error.message, 'error');
+                } finally {
+                    this.mostraLoading(false);
+                }
+            }
+
+            // Leggi file Excel
+            async leggiFileExcel(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onload = (e) => {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, { type: 'array' });
+
+                            const firstSheetName = workbook.SheetNames[0];
+                            const worksheet = workbook.Sheets[firstSheetName];
+
+                            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                            resolve(jsonData);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    };
+
+                    reader.onerror = (error) => reject(error);
+                    reader.readAsArrayBuffer(file);
+                });
+            }
+
+            // Esporta database
+            esportaDatabase() {
+                try {
+                    if (this.database.length === 0) {
+                        this.mostraNotifica('Database vuoto, nessun dato da esportare', 'warning');
+                        return;
+                    }
+
+                    const worksheet = XLSX.utils.json_to_sheet(this.database);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, 'Abbonamenti');
+
+                    XLSX.writeFile(workbook, this.nomeDatabase);
+                    this.mostraNotifica('Database esportato con successo!', 'success');
+                } catch (error) {
+                    console.error('Errore esportazione database:', error);
+                    this.mostraNotifica('Errore durante l\'esportazione del database', 'error');
+                }
+            }
+
+            // Aggiorna informazioni database nell'interfaccia
+            aggiornaInfoDatabase() {
+                const infoDiv = document.getElementById('database-info');
+                infoDiv.style.display = 'block';
+
+                document.getElementById('db-filename').textContent = this.nomeDatabase;
+                document.getElementById('db-count').textContent = this.database.length;
+                document.getElementById('db-next-id').textContent = this.prossimoID.toString().padStart(4, '0');
+            }
+
+            // Carica immagine di sfondo
+            async caricaSfondo(file) {
+                if (!file) return;
+
+                try {
+                    this.sfondoBase64 = await this.fileToBase64(file);
+                    this.aggiornaPreview();
+                    this.mostraNotifica('Immagine di sfondo caricata', 'success');
+                } catch (error) {
+                    console.error('Errore caricamento sfondo:', error);
+                    this.mostraNotifica('Errore durante il caricamento dell\'immagine', 'error');
+                }
+            }
+
+            // Carica QR code
+            async caricaQR(file) {
+                if (!file) return;
+
+                try {
+                    this.qrBase64 = await this.fileToBase64(file);
+                    this.aggiornaPreview();
+                    this.mostraNotifica('QR Code caricato', 'success');
+                } catch (error) {
+                    console.error('Errore caricamento QR:', error);
+                    this.mostraNotifica('Errore durante il caricamento del QR Code', 'error');
+                }
+            }
+
+            // Converti file in Base64
+            fileToBase64(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = error => reject(error);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            // Calcola data scadenza (+365 giorni)
+            calcolaScadenza() {
+                const dataEmissione = document.getElementById('data-emissione-input').valueAsDate;
+
+                if (dataEmissione) {
+                    const dataScadenza = new Date(dataEmissione);
+                    dataScadenza.setDate(dataScadenza.getDate() + 365);
+
+                    document.getElementById('data-scadenza-input').valueAsDate = dataScadenza;
+                    this.aggiornaPreview();
+                }
+            }
+
+            // Aggiorna preview tessera
+            aggiornaPreview() {
+                const nome = document.getElementById('nome-input').value;
+                const cognome = document.getElementById('cognome-input').value;
+                const dataScadenza = document.getElementById('data-scadenza-input').value;
+
+                // Mostra preview se ci sono dati
+                const previewContainer = document.getElementById('preview-container');
+                if (nome || cognome) {
+                    previewContainer.classList.add('active');
+                } else {
+                    previewContainer.classList.remove('active');
+                    return;
+                }
+
+                // Aggiorna fronte
+                const fronteContent = document.getElementById('preview-fronte-content');
+                if (this.sfondoBase64) {
+                    fronteContent.style.backgroundImage = `url(${this.sfondoBase64})`;
+                }
+
+                document.getElementById('preview-numero').textContent = this.prossimoID.toString().padStart(4, '0');
+
+                // Aggiorna retro
+                document.getElementById('preview-nome-retro').textContent = nome || '-';
+                document.getElementById('preview-cognome-retro').textContent = cognome || '-';
+
+                if (dataScadenza) {
+                    const data = new Date(dataScadenza);
+                    const dataFormattata = data.toLocaleDateString('it-IT');
+                    document.getElementById('preview-scadenza-retro').textContent = dataFormattata;
+                }
+
+                // Aggiorna QR
+                const qrContainer = document.getElementById('preview-qr-container');
+                if (this.qrBase64) {
+                    qrContainer.style.display = 'block';
+                    document.getElementById('preview-qr-img').src = this.qrBase64;
+                } else {
+                    qrContainer.style.display = 'none';
+                }
+            }
+
+            // Valida form
+            validaForm() {
+                const nome = document.getElementById('nome-input').value.trim();
+                const cognome = document.getElementById('cognome-input').value.trim();
+                const dataEmissione = document.getElementById('data-emissione-input').value;
+                const dataScadenza = document.getElementById('data-scadenza-input').value;
+
+                if (!nome) {
+                    this.mostraNotifica('Inserisci il nome', 'warning');
+                    return false;
+                }
+
+                if (!cognome) {
+                    this.mostraNotifica('Inserisci il cognome', 'warning');
+                    return false;
+                }
+
+                if (!dataEmissione || !dataScadenza) {
+                    this.mostraNotifica('Le date sono obbligatorie', 'warning');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Genera e salva nuovo abbonamento
+            async generaAbbonamento() {
+                if (!this.validaForm()) return;
+
+                this.mostraLoading(true, 'Generazione abbonamento...');
+
+                try {
+                    const nome = document.getElementById('nome-input').value.trim();
+                    const cognome = document.getElementById('cognome-input').value.trim();
+                    const dataEmissione = document.getElementById('data-emissione-input').value;
+                    const dataScadenza = document.getElementById('data-scadenza-input').value;
+
+                    // Crea record abbonamento
+                    const abbonamento = {
+                        ID_Progressivo: this.prossimoID,
+                        Nome: nome,
+                        Cognome: cognome,
+                        Data_Emissione: dataEmissione,
+                        Data_Scadenza: dataScadenza,
+                        Path_QRCode: this.qrBase64 ? `qrcodes/${nome}_${cognome}_${new Date().getFullYear()}.png` : '',
+                        Path_Immagine: this.sfondoBase64 ? 'stored' : '',
+                        Sfondo_Base64: this.sfondoBase64 || '',
+                        QR_Base64: this.qrBase64 || ''
+                    };
+
+                    // Aggiungi al database
+                    this.database.push(abbonamento);
+                    this.prossimoID++;
+
+                    // Aggiorna interfaccia
+                    this.aggiornaInfoDatabase();
+                    this.aggiornaGrigliaAbbonamenti();
+
+                    // Genera PDF
+                    await this.generaPDFSingolo(abbonamento);
+
+                    // Reset form
+                    this.resetForm();
+
+                    this.mostraNotifica(`Abbonamento N°${abbonamento.ID_Progressivo.toString().padStart(4, '0')} generato con successo!`, 'success');
+                } catch (error) {
+                    console.error('Errore generazione abbonamento:', error);
+                    this.mostraNotifica('Errore durante la generazione dell\'abbonamento', 'error');
+                } finally {
+                    this.mostraLoading(false);
+                }
+            }
+
+            // Genera PDF singolo
+            async generaPDFSingolo(abbonamento) {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    // Crea tessera fronte
+                    const fronteCanvas = await this.creaTesseraFronte(abbonamento);
+                    const fronteImg = fronteCanvas.toDataURL('image/png');
+
+                    // Pagina 1: Fronte
+                    const cardWidth = 85.6;
+                    const cardHeight = 53.98;
+                    const marginX = (297 - cardWidth) / 2; // A4 landscape width = 297mm
+                    const marginY = (210 - cardHeight) / 2; // A4 landscape height = 210mm
+
+                    pdf.addImage(fronteImg, 'PNG', marginX, marginY, cardWidth, cardHeight);
+
+                    // Aggiungi linee di taglio
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.1);
+                    pdf.line(marginX - 5, marginY, marginX - 2, marginY); // Top-left
+                    pdf.line(marginX, marginY - 5, marginX, marginY - 2);
+                    pdf.line(marginX + cardWidth + 2, marginY, marginX + cardWidth + 5, marginY); // Top-right
+                    pdf.line(marginX + cardWidth, marginY - 5, marginX + cardWidth, marginY - 2);
+                    pdf.line(marginX - 5, marginY + cardHeight, marginX - 2, marginY + cardHeight); // Bottom-left
+                    pdf.line(marginX, marginY + cardHeight + 2, marginX, marginY + cardHeight + 5);
+                    pdf.line(marginX + cardWidth + 2, marginY + cardHeight, marginX + cardWidth + 5, marginY + cardHeight); // Bottom-right
+                    pdf.line(marginX + cardWidth, marginY + cardHeight + 2, marginX + cardWidth, marginY + cardHeight + 5);
+
+                    // Pagina 2: Retro
+                    const retroCanvas = await this.creaTesseraRetro(abbonamento);
+                    const retroImg = retroCanvas.toDataURL('image/png');
+
+                    pdf.addPage();
+                    pdf.addImage(retroImg, 'PNG', marginX, marginY, cardWidth, cardHeight);
+
+                    // Aggiungi linee di taglio retro
+                    pdf.line(marginX - 5, marginY, marginX - 2, marginY);
+                    pdf.line(marginX, marginY - 5, marginX, marginY - 2);
+                    pdf.line(marginX + cardWidth + 2, marginY, marginX + cardWidth + 5, marginY);
+                    pdf.line(marginX + cardWidth, marginY - 5, marginX + cardWidth, marginY - 2);
+                    pdf.line(marginX - 5, marginY + cardHeight, marginX - 2, marginY + cardHeight);
+                    pdf.line(marginX, marginY + cardHeight + 2, marginX, marginY + cardHeight + 5);
+                    pdf.line(marginX + cardWidth + 2, marginY + cardHeight, marginX + cardWidth + 5, marginY + cardHeight);
+                    pdf.line(marginX + cardWidth, marginY + cardHeight + 2, marginX + cardWidth, marginY + cardHeight + 5);
+
+                    // Salva PDF
+                    const filename = `Abbonamento_${abbonamento.ID_Progressivo.toString().padStart(4, '0')}_${abbonamento.Nome}_${abbonamento.Cognome}.pdf`;
+                    pdf.save(filename);
+                } catch (error) {
+                    console.error('Errore generazione PDF:', error);
+                    throw error;
+                }
+            }
+
+            // Crea tessera fronte come canvas
+            async creaTesseraFronte(abbonamento) {
+                const canvas = document.createElement('canvas');
+                const dpi = 300; // 300 DPI per stampa di qualità
+                const mmToPx = dpi / 25.4;
+
+                canvas.width = 85.6 * mmToPx;
+                canvas.height = 53.98 * mmToPx;
+
+                const ctx = canvas.getContext('2d');
+
+                // Sfondo
+                if (abbonamento.Sfondo_Base64) {
+                    const img = await this.caricaImmagine(abbonamento.Sfondo_Base64);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                } else {
+                    // Sfondo gradiente di default
+                    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                    gradient.addColorStop(0, '#2196F3');
+                    gradient.addColorStop(1, '#1976D2');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+
+                // Numero progressivo
+                ctx.font = `bold ${24 * mmToPx / 25.4}px "Courier New", monospace`;
+                ctx.fillStyle = 'white';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 4 * mmToPx / 25.4;
+                ctx.shadowOffsetX = 2 * mmToPx / 25.4;
+                ctx.shadowOffsetY = 2 * mmToPx / 25.4;
+                ctx.textAlign = 'right';
+                ctx.fillText(
+                    abbonamento.ID_Progressivo.toString().padStart(4, '0'),
+                    canvas.width - (20 * mmToPx),
+                    canvas.height - (15 * mmToPx)
+                );
+
+                return canvas;
+            }
+
+            // Crea tessera retro come canvas
+            async creaTesseraRetro(abbonamento) {
+                const canvas = document.createElement('canvas');
+                const dpi = 300;
+                const mmToPx = dpi / 25.4;
+
+                canvas.width = 85.6 * mmToPx;
+                canvas.height = 53.98 * mmToPx;
+
+                const ctx = canvas.getContext('2d');
+
+                // Sfondo gradiente
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#f5f5f5');
+                gradient.addColorStop(1, '#e0e0e0');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                const padding = 20 * mmToPx;
+                let yPos = padding;
+
+                // Header
+                ctx.fillStyle = '#2196F3';
+                ctx.fillRect(0, yPos, canvas.width, 2 * mmToPx);
+                yPos += 15 * mmToPx;
+
+                ctx.font = `bold ${12 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.fillStyle = '#2196F3';
+                ctx.textAlign = 'center';
+                ctx.fillText('ABBONAMENTO', canvas.width / 2, yPos);
+                yPos += 20 * mmToPx;
+
+                // Informazioni
+                ctx.font = `${9.5 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.fillStyle = '#212121';
+                ctx.textAlign = 'left';
+
+                ctx.font = `bold ${9.5 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, yPos);
+                yPos += 12 * mmToPx;
+
+                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, yPos);
+                yPos += 12 * mmToPx;
+
+                const dataScadenza = new Date(abbonamento.Data_Scadenza);
+                const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
+                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, yPos);
+
+                // QR Code
+                if (abbonamento.QR_Base64) {
+                    try {
+                        const qrImg = await this.caricaImmagine(abbonamento.QR_Base64);
+                        const qrSize = 25 * mmToPx;
+                        const qrX = (canvas.width - qrSize) / 2;
+                        const qrY = canvas.height - qrSize - (15 * mmToPx);
+
+                        // Bordo QR
+                        ctx.strokeStyle = '#2196F3';
+                        ctx.lineWidth = 2 * mmToPx / 25.4;
+                        ctx.strokeRect(qrX - 2, qrY - 2, qrSize + 4, qrSize + 4);
+
+                        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+                    } catch (error) {
+                        console.error('Errore caricamento QR nel canvas:', error);
+                    }
+                }
+
+                return canvas;
+            }
+
+            // Carica immagine da Base64
+            caricaImmagine(base64) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => resolve(img);
+                    img.onerror = reject;
+                    img.src = base64;
+                });
+            }
+
+            // Reset form
+            resetForm() {
+                document.getElementById('nome-input').value = '';
+                document.getElementById('cognome-input').value = '';
+                document.getElementById('sfondo-input').value = '';
+                document.getElementById('qr-input').value = '';
+
+                const oggi = new Date();
+                document.getElementById('data-emissione-input').valueAsDate = oggi;
+                this.calcolaScadenza();
+
+                this.sfondoBase64 = null;
+                this.qrBase64 = null;
+
+                document.getElementById('preview-container').classList.remove('active');
+
+                // Reset preview sfondo
+                document.getElementById('preview-fronte-content').style.backgroundImage = '';
+            }
+
+            // Aggiorna griglia abbonamenti
+            aggiornaGrigliaAbbonamenti() {
+                const grid = document.getElementById('abbonamenti-grid');
+
+                if (this.database.length === 0) {
+                    grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Nessun abbonamento nel database</p>';
+                    return;
+                }
+
+                grid.innerHTML = '';
+
+                // Ordina per ID decrescente (più recenti prima)
+                const abbonamenti = [...this.database].sort((a, b) => b.ID_Progressivo - a.ID_Progressivo);
+
+                abbonamenti.forEach(abb => {
+                    const card = this.creaCardAbbonamento(abb);
+                    grid.appendChild(card);
+                });
+            }
+
+            // Crea card abbonamento
+            creaCardAbbonamento(abbonamento) {
+                const card = document.createElement('div');
+                card.className = 'abbonamento-card';
+                card.dataset.id = abbonamento.ID_Progressivo;
+
+                const dataScadenza = new Date(abbonamento.Data_Scadenza);
+                const oggi = new Date();
+                const isScaduto = dataScadenza < oggi;
+
+                card.innerHTML = `
+                    <input type="checkbox" onchange="app.toggleSelezione(${abbonamento.ID_Progressivo})">
+                    <div class="abbonamento-info">
+                        <h4>N° ${abbonamento.ID_Progressivo.toString().padStart(4, '0')}</h4>
+                        <p><strong>${abbonamento.Nome} ${abbonamento.Cognome}</strong></p>
+                        <p>Emissione: ${new Date(abbonamento.Data_Emissione).toLocaleDateString('it-IT')}</p>
+                        <p>Scadenza: ${dataScadenza.toLocaleDateString('it-IT')}</p>
+                        <span class="abbonamento-badge ${isScaduto ? 'badge-scaduto' : 'badge-attivo'}">
+                            ${isScaduto ? '❌ Scaduto' : '✅ Attivo'}
+                        </span>
+                    </div>
+                `;
+
+                return card;
+            }
+
+            // Toggle selezione abbonamento
+            toggleSelezione(id) {
+                if (this.abbonamenti Selezionati.has(id)) {
+                    this.abbonamenti Selezionati.delete(id);
+                    document.querySelector(`[data-id="${id}"]`).classList.remove('selected');
+                } else {
+                    if (this.abbonamenti Selezionati.size >= 4) {
+                        this.mostraNotifica('Puoi selezionare massimo 4 abbonamenti', 'warning');
+                        document.querySelector(`[data-id="${id}"] input`).checked = false;
+                        return;
+                    }
+                    this.abbonamenti Selezionati.add(id);
+                    document.querySelector(`[data-id="${id}"]`).classList.add('selected');
+                }
+
+                this.aggiornaContatoreSelezioni();
+            }
+
+            // Aggiorna contatore selezioni
+            aggiornaContatoreSelezioni() {
+                const count = this.abbonamenti Selezionati.size;
+                document.getElementById('count-selected').textContent = count;
+                document.getElementById('btn-stampa').disabled = count === 0;
+            }
+
+            // Deseleziona tutti
+            deselezionaTutti() {
+                this.abbonamenti Selezionati.clear();
+                document.querySelectorAll('.abbonamento-card input[type="checkbox"]').forEach(cb => {
+                    cb.checked = false;
+                });
+                document.querySelectorAll('.abbonamento-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                this.aggiornaContatoreSelezioni();
+            }
+
+            // Cerca abbonamenti
+            cercaAbbonamenti() {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+                document.querySelectorAll('.abbonamento-card').forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            // Stampa abbonamenti selezionati
+            async stampaSelezionati() {
+                if (this.abbonamenti Selezionati.size === 0) {
+                    this.mostraNotifica('Seleziona almeno un abbonamento', 'warning');
+                    return;
+                }
+
+                this.mostraLoading(true, 'Generazione PDF in corso...');
+
+                try {
+                    const abbonamenti = Array.from(this.abbonamenti Selezionati)
+                        .map(id => this.database.find(a => a.ID_Progressivo === id))
+                        .filter(a => a !== undefined);
+
+                    if (abbonamenti.length === 1) {
+                        await this.generaPDFSingolo(abbonamenti[0]);
+                    } else {
+                        await this.generaPDFMultiplo(abbonamenti);
+                    }
+
+                    this.mostraNotifica(`PDF generato con successo per ${abbonamenti.length} tessera/e`, 'success');
+                } catch (error) {
+                    console.error('Errore stampa abbonamenti:', error);
+                    this.mostraNotifica('Errore durante la generazione del PDF', 'error');
+                } finally {
+                    this.mostraLoading(false);
+                }
+            }
+
+            // Genera PDF multiplo (griglia 2x2)
+            async generaPDFMultiplo(abbonamenti) {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: 'portrait',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+
+                    const cardWidth = 85.6;
+                    const cardHeight = 53.98;
+                    const spacing = 10;
+                    const startX = (210 - (cardWidth * 2 + spacing)) / 2; // A4 width = 210mm
+                    const startY = 20;
+
+                    // Raggruppa per pagina (max 4 tessere per pagina, 2 per tipo)
+                    for (let i = 0; i < abbonamenti.length; i += 2) {
+                        if (i > 0) pdf.addPage();
+
+                        const batch = abbonamenti.slice(i, i + 2);
+
+                        // Titolo pagina
+                        pdf.setFontSize(14);
+                        pdf.setTextColor(33, 150, 243);
+                        pdf.text('Tessere Abbonamento - Fronte', 105, 10, { align: 'center' });
+
+                        // Fronte tessere
+                        for (let j = 0; j < batch.length; j++) {
+                            const abb = batch[j];
+                            const fronteCanvas = await this.creaTesseraFronte(abb);
+                            const fronteImg = fronteCanvas.toDataURL('image/png');
+
+                            const x = startX;
+                            const y = startY + (j * (cardHeight + spacing));
+
+                            pdf.addImage(fronteImg, 'PNG', x, y, cardWidth, cardHeight);
+
+                            // Linee di taglio
+                            pdf.setDrawColor(200, 200, 200);
+                            pdf.setLineWidth(0.1);
+                            pdf.line(x - 3, y, x - 1, y);
+                            pdf.line(x, y - 3, x, y - 1);
+                            pdf.line(x + cardWidth + 1, y, x + cardWidth + 3, y);
+                            pdf.line(x + cardWidth, y - 3, x + cardWidth, y - 1);
+                        }
+
+                        // Aggiungi pagina retro
+                        pdf.addPage();
+                        pdf.setFontSize(14);
+                        pdf.text('Tessere Abbonamento - Retro', 105, 10, { align: 'center' });
+
+                        // Retro tessere
+                        for (let j = 0; j < batch.length; j++) {
+                            const abb = batch[j];
+                            const retroCanvas = await this.creaTesseraRetro(abb);
+                            const retroImg = retroCanvas.toDataURL('image/png');
+
+                            const x = startX;
+                            const y = startY + (j * (cardHeight + spacing));
+
+                            pdf.addImage(retroImg, 'PNG', x, y, cardWidth, cardHeight);
+
+                            // Linee di taglio
+                            pdf.setDrawColor(200, 200, 200);
+                            pdf.setLineWidth(0.1);
+                            pdf.line(x - 3, y, x - 1, y);
+                            pdf.line(x, y - 3, x, y - 1);
+                            pdf.line(x + cardWidth + 1, y, x + cardWidth + 3, y);
+                            pdf.line(x + cardWidth, y - 3, x + cardWidth, y - 1);
+                        }
+                    }
+
+                    // Salva PDF
+                    const timestamp = new Date().toISOString().split('T')[0];
+                    const filename = `Abbonamenti_Multipli_${timestamp}.pdf`;
+                    pdf.save(filename);
+                } catch (error) {
+                    console.error('Errore generazione PDF multiplo:', error);
+                    throw error;
+                }
+            }
+        }
+
+        // Inizializza applicazione
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new AbbonamentoManager();
+        });
+    </script>
+</body>
+</html>
