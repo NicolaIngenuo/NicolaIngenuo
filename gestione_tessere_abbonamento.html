@@ -276,7 +276,7 @@
             position: relative;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+            background: white;
             padding: 15px;
             display: flex;
             flex-direction: column;
@@ -290,7 +290,7 @@
 
         .tessera-header h3 {
             color: var(--primary-color);
-            font-size: 1.2rem;
+            font-size: 0.75rem;
             font-weight: bold;
         }
 
@@ -312,7 +312,7 @@
         }
 
         .tessera-info-text p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-primary);
             margin: 2px 0;
         }
@@ -328,8 +328,8 @@
         }
 
         .tessera-qr img {
-            width: 60px;
-            height: 60px;
+            width: 75px;
+            height: 75px;
             border: 2px solid var(--primary-color);
             border-radius: 6px;
         }
@@ -1219,11 +1219,8 @@
 
                 const ctx = canvas.getContext('2d');
 
-                // Sfondo gradiente
-                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                gradient.addColorStop(0, '#f5f5f5');
-                gradient.addColorStop(1, '#e0e0e0');
-                ctx.fillStyle = gradient;
+                // Sfondo bianco
+                ctx.fillStyle = 'white';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 const padding = 15 * mmToPx;
@@ -1234,14 +1231,14 @@
                 ctx.fillRect(0, yPos, canvas.width, 2 * mmToPx);
                 yPos += 10 * mmToPx;
 
-                ctx.font = `bold ${10 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.font = `bold ${7 * mmToPx / 25.4}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#2196F3';
                 ctx.textAlign = 'center';
                 ctx.fillText('ABBONAMENTO', canvas.width / 2, yPos);
                 yPos += 12 * mmToPx;
 
                 // Calcolo posizione QR (a destra)
-                const qrSize = 20 * mmToPx;
+                const qrSize = 26 * mmToPx;
                 const qrX = canvas.width - qrSize - padding;
                 const qrYCenter = yPos + (canvas.height - yPos - padding) / 2;
 
