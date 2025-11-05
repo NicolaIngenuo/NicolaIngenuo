@@ -768,7 +768,7 @@
                 this.nomeDatabase = 'database_abbonamenti.xlsx';
                 this.sfondoBase64 = null;
                 this.qrBase64 = null;
-                this.abbonamenti Selezionati = new Set();
+                this.abbonamentiSelezionati = new Set();
 
                 // Inizializzazione
                 this.init();
@@ -1344,16 +1344,16 @@
 
             // Toggle selezione abbonamento
             toggleSelezione(id) {
-                if (this.abbonamenti Selezionati.has(id)) {
-                    this.abbonamenti Selezionati.delete(id);
+                if (this.abbonamentiSelezionati.has(id)) {
+                    this.abbonamentiSelezionati.delete(id);
                     document.querySelector(`[data-id="${id}"]`).classList.remove('selected');
                 } else {
-                    if (this.abbonamenti Selezionati.size >= 4) {
+                    if (this.abbonamentiSelezionati.size >= 4) {
                         this.mostraNotifica('Puoi selezionare massimo 4 abbonamenti', 'warning');
                         document.querySelector(`[data-id="${id}"] input`).checked = false;
                         return;
                     }
-                    this.abbonamenti Selezionati.add(id);
+                    this.abbonamentiSelezionati.add(id);
                     document.querySelector(`[data-id="${id}"]`).classList.add('selected');
                 }
 
@@ -1362,14 +1362,14 @@
 
             // Aggiorna contatore selezioni
             aggiornaContatoreSelezioni() {
-                const count = this.abbonamenti Selezionati.size;
+                const count = this.abbonamentiSelezionati.size;
                 document.getElementById('count-selected').textContent = count;
                 document.getElementById('btn-stampa').disabled = count === 0;
             }
 
             // Deseleziona tutti
             deselezionaTutti() {
-                this.abbonamenti Selezionati.clear();
+                this.abbonamentiSelezionati.clear();
                 document.querySelectorAll('.abbonamento-card input[type="checkbox"]').forEach(cb => {
                     cb.checked = false;
                 });
@@ -1395,7 +1395,7 @@
 
             // Stampa abbonamenti selezionati
             async stampaSelezionati() {
-                if (this.abbonamenti Selezionati.size === 0) {
+                if (this.abbonamentiSelezionati.size === 0) {
                     this.mostraNotifica('Seleziona almeno un abbonamento', 'warning');
                     return;
                 }
@@ -1403,7 +1403,7 @@
                 this.mostraLoading(true, 'Generazione PDF in corso...');
 
                 try {
-                    const abbonamenti = Array.from(this.abbonamenti Selezionati)
+                    const abbonamenti = Array.from(this.abbonamentiSelezionati)
                         .map(id => this.database.find(a => a.ID_Progressivo === id))
                         .filter(a => a !== undefined);
 
