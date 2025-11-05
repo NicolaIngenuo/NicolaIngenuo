@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         /* Reset e Base Styles */
@@ -19,124 +20,93 @@
         }
 
         :root {
-            --primary: #1a73e8;
-            --primary-dark: #1557b0;
-            --primary-light: #e8f0fe;
-            --success: #34a853;
-            --danger: #ea4335;
-            --warning: #fbbc04;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --border: #dadce0;
-            --bg-gray: #f8f9fa;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-            --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
+            --primary-color: #2196F3;
+            --primary-dark: #1976D2;
+            --success-color: #4CAF50;
+            --danger-color: #f44336;
+            --warning-color: #ff9800;
+            --text-primary: #212121;
+            --text-secondary: #757575;
+            --border-color: #e0e0e0;
+            --bg-light: #f5f5f5;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --card-shadow-hover: 0 4px 16px rgba(0,0,0,0.15);
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 20px;
             color: var(--text-primary);
-            line-height: 1.6;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 24px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
         }
 
         /* Header */
         .header {
-            background: white;
-            padding: 32px;
-            margin-bottom: 24px;
-            border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border-left: 4px solid var(--primary);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
         }
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .header-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary-light);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .header-icon svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--primary);
-        }
-
-        .header-text h1 {
-            font-size: 1.75rem;
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 4px;
         }
 
-        .header-text p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
         }
 
-        /* Main Grid */
-        .main-grid {
+        /* Main Content */
+        .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 30px;
+            padding: 30px;
         }
 
         @media (max-width: 1200px) {
-            .main-grid {
+            .main-content {
                 grid-template-columns: 1fr;
             }
         }
 
-        /* Card */
-        .card {
+        /* Card Sections */
+        .section {
             background: white;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border);
+            padding: 25px;
+            box-shadow: var(--card-shadow);
         }
 
-        .card-header {
+        .section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+            gap: 10px;
         }
 
-        .card-header svg {
-            width: 24px;
+        .section h2::before {
+            content: '';
+            width: 4px;
             height: 24px;
-            fill: var(--primary);
-        }
-
-        .card-header h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
-        .card.full-width {
-            grid-column: 1 / -1;
+            background: var(--primary-color);
+            border-radius: 2px;
         }
 
         /* Form Groups */
@@ -147,101 +117,106 @@
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.95rem;
         }
 
         .form-group input[type="text"],
         .form-group input[type="date"],
         .form-group input[type="file"] {
             width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
             font-family: inherit;
-            transition: all 0.2s;
-            background: white;
         }
 
         .form-group input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
 
         .form-group input[type="file"] {
             cursor: pointer;
-            padding: 8px 12px;
+            padding: 10px;
         }
 
         /* Buttons */
         .btn {
-            padding: 10px 20px;
+            padding: 12px 24px;
             border: none;
             border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-family: inherit;
             text-decoration: none;
-        }
-
-        .btn svg {
-            width: 18px;
-            height: 18px;
+            font-family: inherit;
         }
 
         .btn-primary {
-            background: var(--primary);
+            background: var(--primary-color);
             color: white;
         }
 
         .btn-primary:hover {
             background: var(--primary-dark);
-            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
         }
 
         .btn-success {
-            background: var(--success);
+            background: var(--success-color);
             color: white;
         }
 
         .btn-success:hover {
-            background: #2d8e47;
-            box-shadow: var(--shadow-md);
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #da190b;
         }
 
         .btn-secondary {
-            background: var(--bg-gray);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
+            background: #9e9e9e;
+            color: white;
         }
 
         .btn-secondary:hover {
-            background: #e8eaed;
+            background: #757575;
         }
 
         .btn:disabled {
-            opacity: 0.5;
+            opacity: 0.6;
             cursor: not-allowed;
+            transform: none !important;
         }
 
         .btn-group {
             display: flex;
             gap: 10px;
             flex-wrap: wrap;
-            margin-top: 16px;
+            margin-top: 20px;
         }
 
-        /* Tessere Preview */
+        /* Tessera Preview */
         .preview-container {
-            margin-top: 24px;
+            margin-top: 20px;
             display: none;
         }
 
@@ -251,10 +226,10 @@
 
         .preview-label {
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             letter-spacing: 0.5px;
         }
 
@@ -263,27 +238,16 @@
             gap: 20px;
             justify-content: center;
             flex-wrap: wrap;
+            margin-top: 15px;
         }
 
-        .preview-item {
-            text-align: center;
-        }
-
-        .preview-item label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        /* Tessera - Formato Carta di Credito: 85.6mm x 53.98mm */
+        /* Formato Carta di Credito: 85.6mm x 53.98mm = 323.7px x 204.1px @ 96dpi */
         .tessera {
             width: 323.7px;
             height: 204.1px;
             position: relative;
             border-radius: 12px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
             overflow: hidden;
             background: white;
         }
@@ -294,7 +258,7 @@
             height: 100%;
             background-size: cover;
             background-position: center;
-            background-color: var(--primary);
+            background-color: var(--primary-color);
         }
 
         .tessera-numero {
@@ -312,12 +276,22 @@
             position: relative;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-color: white;
+            background: white;
             padding: 15px;
             display: flex;
             flex-direction: column;
+        }
+
+        .tessera-header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .tessera-header h3 {
+            color: var(--primary-color);
+            font-size: 0.75rem;
+            font-weight: bold;
         }
 
         .tessera-info {
@@ -326,6 +300,7 @@
             flex-direction: row;
             align-items: center;
             gap: 15px;
+            margin-top: 10px;
         }
 
         .tessera-info-text {
@@ -342,6 +317,10 @@
             margin: 2px 0;
         }
 
+        .tessera-info strong {
+            color: var(--primary-dark);
+        }
+
         .tessera-qr {
             display: flex;
             align-items: center;
@@ -351,133 +330,113 @@
         .tessera-qr img {
             width: 75px;
             height: 75px;
-            border: 2px solid var(--primary);
+            border: 2px solid var(--primary-color);
             border-radius: 6px;
         }
 
-        /* Search Box */
+        /* Sezione Ristampa */
         .search-box {
             margin-bottom: 20px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 16px 12px 44px;
-            border: 1px solid var(--border);
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background: white url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235f6368" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 12px center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
 
         .search-box input:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
         }
 
-        /* Abbonamenti Grid */
         .abbonamenti-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            gap: 15px;
             max-height: 600px;
             overflow-y: auto;
-            padding: 4px;
+            padding: 10px;
         }
 
         .abbonamento-card {
-            background: white;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
+            background: var(--bg-light);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             position: relative;
         }
 
         .abbonamento-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
+            border-color: var(--primary-color);
+            box-shadow: var(--card-shadow-hover);
+            transform: translateY(-2px);
         }
 
         .abbonamento-card.selected {
-            border-color: var(--success);
-            background: #f0fdf4;
+            border-color: var(--success-color);
+            background: rgba(76, 175, 80, 0.1);
         }
 
         .abbonamento-card input[type="checkbox"] {
             position: absolute;
-            top: 16px;
-            right: 16px;
+            top: 15px;
+            right: 15px;
             width: 20px;
             height: 20px;
             cursor: pointer;
-            accent-color: var(--success);
         }
 
         .abbonamento-info h4 {
-            color: var(--text-primary);
+            color: var(--primary-dark);
             margin-bottom: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         .abbonamento-info p {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
             margin: 4px 0;
         }
 
         .abbonamento-badge {
             display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
             margin-top: 8px;
         }
 
         .badge-attivo {
-            background: #d1f4e0;
-            color: var(--success);
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
         }
 
         .badge-scaduto {
-            background: #fce8e6;
-            color: var(--danger);
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger-color);
         }
 
-        /* File Info */
-        .file-info {
-            padding: 14px 16px;
-            background: var(--primary-light);
-            border-left: 3px solid var(--primary);
-            border-radius: 6px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-        }
-
-        .file-info strong {
-            color: var(--primary-dark);
-        }
-
-        /* Notifications */
+        /* Notifiche */
         .notification {
             position: fixed;
-            top: 24px;
-            right: 24px;
-            padding: 16px 20px;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
             border-radius: 8px;
             color: white;
-            font-weight: 500;
-            box-shadow: var(--shadow-lg);
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             z-index: 9999;
             animation: slideIn 0.3s ease;
             max-width: 400px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
         }
 
         @keyframes slideIn {
@@ -491,15 +450,20 @@
             }
         }
 
-        .notification.success { background: var(--success); }
-        .notification.error { background: var(--danger); }
-        .notification.warning { background: var(--warning); }
-        .notification.info { background: var(--primary); }
+        .notification.success {
+            background: var(--success-color);
+        }
 
-        .notification svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
+        .notification.error {
+            background: var(--danger-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        .notification.info {
+            background: var(--primary-color);
         }
 
         /* Loading Spinner */
@@ -520,18 +484,13 @@
             display: flex;
         }
 
-        .spinner-content {
-            text-align: center;
-        }
-
         .spinner {
             width: 60px;
             height: 60px;
-            border: 5px solid rgba(255,255,255,0.3);
+            border: 6px solid rgba(255,255,255,0.3);
             border-top-color: white;
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
         }
 
         @keyframes spin {
@@ -539,46 +498,91 @@
         }
 
         .spinner-text {
+            position: absolute;
             color: white;
-            font-size: 1.1rem;
-            font-weight: 500;
+            margin-top: 100px;
+            font-size: 1.2rem;
+            font-weight: 600;
         }
 
-        /* Scrollbar */
-        .abbonamenti-grid::-webkit-scrollbar {
-            width: 8px;
+        /* Database Controls */
+        .database-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
-        .abbonamenti-grid::-webkit-scrollbar-track {
-            background: var(--bg-gray);
+        .file-info {
+            padding: 12px;
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid var(--primary-color);
             border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
         }
 
-        .abbonamenti-grid::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 4px;
+        .file-info strong {
+            color: var(--primary-color);
         }
 
-        .abbonamenti-grid::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Hidden Elements for PDF Generation */
+        #pdf-workspace {
+            position: fixed;
+            left: -9999px;
+            top: 0;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 12px;
+            .header h1 {
+                font-size: 1.8rem;
             }
 
-            .header {
-                padding: 20px;
+            .main-content {
+                padding: 15px;
+                gap: 20px;
             }
 
-            .card {
-                padding: 16px;
+            .section {
+                padding: 15px;
             }
 
             .tessera {
                 transform: scale(0.8);
+            }
+
+            .card-preview {
+                gap: 10px;
             }
 
             .abbonamenti-grid {
@@ -586,34 +590,34 @@
             }
         }
 
-        /* Utility Folder Info Alert */
-        .alert {
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            font-size: 0.9rem;
+        /* Scroll personalizzato */
+        .abbonamenti-grid::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .alert svg {
-            width: 20px;
-            height: 20px;
-            flex-shrink: 0;
-            margin-top: 2px;
+        .abbonamenti-grid::-webkit-scrollbar-track {
+            background: var(--bg-light);
+            border-radius: 4px;
         }
 
-        .alert-info {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-            border-left: 3px solid var(--primary);
+        .abbonamenti-grid::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
         }
 
-        .alert-warning {
-            background: #fef7e0;
-            color: #9c6c00;
-            border-left: 3px solid var(--warning);
+        .abbonamenti-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Database Section */
+        .database-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.05) 0%, rgba(33, 150, 243, 0.1) 100%);
+        }
+
+        /* Full Width Sections */
+        .full-width {
+            grid-column: 1 / -1;
         }
     </style>
 </head>
@@ -621,83 +625,42 @@
     <!-- Header -->
     <div class="container">
         <div class="header">
-            <div class="header-content">
-                <div class="header-icon">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V6h16v12zM6 10h2v2H6zm0 4h8v2H6zm10-4h2v6h-2z"/>
-                    </svg>
-                </div>
-                <div class="header-text">
-                    <h1>Gestione Tessere Abbonamento</h1>
-                    <p>Sistema professionale per creazione e stampa tessere formato carta di credito</p>
-                </div>
-            </div>
+            <h1>🎫 Gestione Tessere Abbonamento</h1>
+            <p>Sistema professionale per creazione e stampa tessere formato carta di credito</p>
         </div>
 
-        <!-- Alert Cartella Utility -->
-        <div class="alert alert-info">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"/>
-            </svg>
-            <div>
-                <strong>Cartella Utility:</strong> Posiziona i file <code>sfondo_fronte.jpg</code>, <code>sfondo_retro.jpg</code> e <code>database_abbonamenti.xlsx</code> nella cartella <code>Utility/</code> per il caricamento automatico.
-            </div>
-        </div>
-
-        <!-- Main Grid -->
-        <div class="main-grid">
+        <!-- Main Content -->
+        <div class="main-content">
 
             <!-- Database Section -->
-            <div class="card full-width">
-                <div class="card-header">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 3C7.58 3 4 4.79 4 7s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4M4 9v3c0 2.21 3.58 4 8 4s8-1.79 8-4V9c0 2.21-3.58 4-8 4s-8-1.79-8-4m0 5v3c0 2.21 3.58 4 8 4s8-1.79 8-4v-3c0 2.21-3.58 4-8 4s-8-1.79-8-4z"/>
-                    </svg>
-                    <h2>Database</h2>
-                </div>
-
+            <div class="section database-section">
+                <h2>📁 Database</h2>
                 <div id="database-info" class="file-info" style="display: none;">
-                    <strong>Database:</strong> <span id="db-filename"></span> |
-                    <strong>Abbonamenti:</strong> <span id="db-count">0</span> |
+                    <strong>Database caricato:</strong> <span id="db-filename"></span> -
+                    <strong>Abbonamenti totali:</strong> <span id="db-count">0</span> -
                     <strong>Prossimo ID:</strong> <span id="db-next-id">1</span>
                 </div>
-
-                <div class="btn-group">
+                <div class="database-controls">
                     <button class="btn btn-primary" onclick="app.nuovoDatabase()">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-                        </svg>
-                        Nuovo Database
+                        📝 Nuovo Database
                     </button>
                     <button class="btn btn-secondary" onclick="document.getElementById('db-file-input').click()">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                        </svg>
-                        Carica Database
+                        📂 Carica Database Esistente
                     </button>
                     <button class="btn btn-success" onclick="app.esportaDatabase()" id="btn-export" disabled>
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4m-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3m3-10H5V5h10v4z"/>
-                        </svg>
-                        Esporta
+                        💾 Esporta Database
                     </button>
-                    <button class="btn btn-secondary" onclick="app.caricaAutomatico()">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-                        </svg>
-                        Carica da Utility
-                    </button>
+                    <input type="file" id="db-file-input" accept=".xlsx" style="display: none;" onchange="app.caricaDatabase(this.files[0])">
                 </div>
-                <input type="file" id="db-file-input" accept=".xlsx" style="display: none;" onchange="app.caricaDatabase(this.files[0])">
             </div>
 
             <!-- Nuovo Abbonamento -->
-            <div class="card">
-                <div class="card-header">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 2L3 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5m0 5c1.11 0 2 .89 2 2s-.89 2-2 2-2-.89-2-2 .89-2 2-2m-4 8.5c0-1.33 2.67-2 4-2s4 .67 4 2V18H8v-2.5z"/>
-                    </svg>
-                    <h2>Nuovo Abbonamento</h2>
+            <div class="section">
+                <h2>➕ Nuovo Abbonamento</h2>
+
+                <div class="form-group">
+                    <label for="sfondo-input">Immagine di Sfondo (Fronte)</label>
+                    <input type="file" id="sfondo-input" accept="image/jpeg,image/png" onchange="app.caricaSfondo(this.files[0])">
                 </div>
 
                 <div class="form-group">
@@ -727,16 +690,10 @@
 
                 <div class="btn-group">
                     <button class="btn btn-success" onclick="app.generaAbbonamento()" id="btn-genera">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                        </svg>
-                        Genera Abbonamento
+                        ✅ Genera e Salva Abbonamento
                     </button>
                     <button class="btn btn-secondary" onclick="app.resetForm()">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-                        </svg>
-                        Reset
+                        🔄 Reset
                     </button>
                 </div>
 
@@ -744,18 +701,21 @@
                 <div id="preview-container" class="preview-container">
                     <div class="preview-label">Anteprima Tessera</div>
                     <div class="card-preview">
-                        <div class="preview-item">
-                            <label>FRONTE</label>
-                            <div class="tessera">
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 600;">FRONTE</p>
+                            <div class="tessera" id="preview-fronte">
                                 <div class="tessera-fronte" id="preview-fronte-content">
-                                    <div class="tessera-numero" id="preview-numero">001</div>
+                                    <div class="tessera-numero" id="preview-numero">0001</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="preview-item">
-                            <label>RETRO</label>
-                            <div class="tessera">
-                                <div class="tessera-retro" id="preview-retro-content">
+                        <div>
+                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; font-weight: 600;">RETRO</p>
+                            <div class="tessera" id="preview-retro">
+                                <div class="tessera-retro">
+                                    <div class="tessera-header">
+                                        <h3>ABBONAMENTO</h3>
+                                    </div>
                                     <div class="tessera-info">
                                         <div class="tessera-info-text">
                                             <p><strong>Nome:</strong> <span id="preview-nome-retro">-</span></p>
@@ -774,30 +734,19 @@
             </div>
 
             <!-- Ristampa Abbonamenti -->
-            <div class="card full-width">
-                <div class="card-header">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3m-3 11H8v-5h8v5m3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m-1-9H6v4h12V3z"/>
-                    </svg>
-                    <h2>Ristampa Abbonamenti</h2>
-                </div>
+            <div class="section full-width">
+                <h2>🖨️ Ristampa Abbonamenti</h2>
 
                 <div class="search-box">
-                    <input type="text" id="search-input" placeholder="Cerca per nome, cognome o numero..." oninput="app.cercaAbbonamenti()">
+                    <input type="text" id="search-input" placeholder="🔍 Cerca per nome, cognome o numero..." oninput="app.cercaAbbonamenti()">
                 </div>
 
                 <div class="btn-group">
                     <button class="btn btn-primary" onclick="app.stampaSelezionati()" id="btn-stampa" disabled>
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3m-3 11H8v-5h8v5m3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m-1-9H6v4h12V3z"/>
-                        </svg>
-                        Stampa Selezionati (<span id="count-selected">0</span>/4)
+                        🖨️ Stampa Selezionati (<span id="count-selected">0</span>/4)
                     </button>
                     <button class="btn btn-secondary" onclick="app.deselezionaTutti()">
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                        Deseleziona Tutti
+                        ❌ Deseleziona Tutti
                     </button>
                 </div>
 
@@ -812,11 +761,14 @@
 
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="loading-spinner">
-        <div class="spinner-content">
+        <div>
             <div class="spinner"></div>
             <div class="spinner-text" id="loading-text">Caricamento...</div>
         </div>
     </div>
+
+    <!-- PDF Workspace (Hidden) -->
+    <div id="pdf-workspace"></div>
 
     <!-- JavaScript -->
     <script>
@@ -826,28 +778,32 @@
                 this.database = [];
                 this.prossimoID = 1;
                 this.nomeDatabase = 'database_abbonamenti.xlsx';
-                this.sfondoFronteBase64 = null;
-                this.sfondoRetroBase64 = null;
+                this.sfondoBase64 = null;
                 this.qrBase64 = null;
                 this.abbonamentiSelezionati = new Set();
+
+                // Inizializzazione
                 this.init();
             }
 
             // Inizializzazione dell'applicazione
             init() {
                 console.log('Inizializzazione Gestione Tessere Abbonamento...');
+
+                // Imposta data emissione corrente
                 const oggi = new Date();
                 document.getElementById('data-emissione-input').valueAsDate = oggi;
                 this.calcolaScadenza();
 
-                // Tentativo di caricamento automatico all'avvio
-                setTimeout(() => this.caricaAutomatico(), 500);
+                // Tentativo di caricamento automatico database
+                this.tentaCaricamentoAutomatico();
             }
 
             // Mostra/Nascondi loading spinner
             mostraLoading(mostra, testo = 'Caricamento...') {
                 const spinner = document.getElementById('loading-spinner');
                 const loadingText = document.getElementById('loading-text');
+
                 if (mostra) {
                     loadingText.textContent = testo;
                     spinner.classList.add('active');
@@ -860,23 +816,8 @@
             mostraNotifica(messaggio, tipo = 'info') {
                 const notification = document.createElement('div');
                 notification.className = `notification ${tipo}`;
+                notification.textContent = messaggio;
 
-                let icon = '';
-                switch(tipo) {
-                    case 'success':
-                        icon = '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
-                        break;
-                    case 'error':
-                        icon = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>';
-                        break;
-                    case 'warning':
-                        icon = '<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>';
-                        break;
-                    default:
-                        icon = '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>';
-                }
-
-                notification.innerHTML = icon + '<span>' + messaggio + '</span>';
                 document.body.appendChild(notification);
 
                 setTimeout(() => {
@@ -885,49 +826,12 @@
                 }, 3000);
             }
 
-            // Caricamento automatico da cartella Utility
-            async caricaAutomatico() {
-                this.mostraLoading(true, 'Ricerca file nella cartella Utility...');
-
-                try {
-                    // Prova a caricare gli sfondi di default
-                    await this.caricaSfondiDefault();
-
-                    // Nota: Il caricamento automatico del database e immagini da file system
-                    // non è possibile per restrizioni di sicurezza del browser.
-                    // L'utente deve selezionare manualmente i file.
-
-                    this.mostraNotifica('Per caricare database e sfondi, usa i pulsanti "Carica" o posiziona i file in Utility/', 'info');
-                } catch (error) {
-                    console.log('Caricamento automatico non disponibile:', error);
-                } finally {
-                    this.mostraLoading(false);
-                }
-            }
-
-            // Carica sfondi di default (placeholder)
-            async caricaSfondiDefault() {
-                // Crea sfondi gradienti di default
-                const canvasFronte = document.createElement('canvas');
-                canvasFronte.width = 1000;
-                canvasFronte.height = 630;
-                const ctxFronte = canvasFronte.getContext('2d');
-                const gradientFronte = ctxFronte.createLinearGradient(0, 0, 1000, 630);
-                gradientFronte.addColorStop(0, '#1a73e8');
-                gradientFronte.addColorStop(1, '#1557b0');
-                ctxFronte.fillStyle = gradientFronte;
-                ctxFronte.fillRect(0, 0, 1000, 630);
-                this.sfondoFronteBase64 = canvasFronte.toDataURL('image/jpeg', 0.9);
-
-                const canvasRetro = document.createElement('canvas');
-                canvasRetro.width = 1000;
-                canvasRetro.height = 630;
-                const ctxRetro = canvasRetro.getContext('2d');
-                ctxRetro.fillStyle = 'white';
-                ctxRetro.fillRect(0, 0, 1000, 630);
-                this.sfondoRetroBase64 = canvasRetro.toDataURL('image/jpeg', 0.9);
-
-                this.aggiornaPreview();
+            // Tentativo caricamento automatico database
+            async tentaCaricamentoAutomatico() {
+                // In ambiente browser, non possiamo accedere direttamente al filesystem
+                // Mostriamo un messaggio informativo
+                console.log('Per iniziare, crea un nuovo database o carica uno esistente.');
+                this.mostraNotifica('Benvenuto! Crea un nuovo database o caricane uno esistente.', 'info');
             }
 
             // Crea nuovo database
@@ -938,6 +842,8 @@
                     this.aggiornaInfoDatabase();
                     this.aggiornaGrigliaAbbonamenti();
                     this.mostraNotifica('Nuovo database creato con successo!', 'success');
+
+                    // Abilita pulsante esporta
                     document.getElementById('btn-export').disabled = false;
                 } catch (error) {
                     console.error('Errore creazione database:', error);
@@ -948,25 +854,32 @@
             // Carica database da file
             async caricaDatabase(file) {
                 if (!file) return;
+
                 this.mostraLoading(true, 'Caricamento database...');
 
                 try {
                     const data = await this.leggiFileExcel(file);
+
                     if (data && data.length > 0) {
                         this.database = data;
                         this.nomeDatabase = file.name;
+
+                        // Calcola prossimo ID
                         const maxID = Math.max(...data.map(a => parseInt(a.ID_Progressivo) || 0), 0);
                         this.prossimoID = maxID + 1;
+
                         this.aggiornaInfoDatabase();
                         this.aggiornaGrigliaAbbonamenti();
-                        this.mostraNotifica(`Database caricato: ${data.length} abbonamenti`, 'success');
+                        this.mostraNotifica(`Database caricato: ${data.length} abbonamenti trovati`, 'success');
+
+                        // Abilita pulsante esporta
                         document.getElementById('btn-export').disabled = false;
                     } else {
                         throw new Error('Database vuoto o formato non valido');
                     }
                 } catch (error) {
                     console.error('Errore caricamento database:', error);
-                    this.mostraNotifica('Errore durante il caricamento: ' + error.message, 'error');
+                    this.mostraNotifica('Errore durante il caricamento del database: ' + error.message, 'error');
                 } finally {
                     this.mostraLoading(false);
                 }
@@ -976,18 +889,22 @@
             async leggiFileExcel(file) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
+
                     reader.onload = (e) => {
                         try {
                             const data = new Uint8Array(e.target.result);
                             const workbook = XLSX.read(data, { type: 'array' });
+
                             const firstSheetName = workbook.SheetNames[0];
                             const worksheet = workbook.Sheets[firstSheetName];
+
                             const jsonData = XLSX.utils.sheet_to_json(worksheet);
                             resolve(jsonData);
                         } catch (error) {
                             reject(error);
                         }
                     };
+
                     reader.onerror = (error) => reject(error);
                     reader.readAsArrayBuffer(file);
                 });
@@ -1000,36 +917,54 @@
                         this.mostraNotifica('Database vuoto, nessun dato da esportare', 'warning');
                         return;
                     }
+
                     const worksheet = XLSX.utils.json_to_sheet(this.database);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, 'Abbonamenti');
+
                     XLSX.writeFile(workbook, this.nomeDatabase);
                     this.mostraNotifica('Database esportato con successo!', 'success');
                 } catch (error) {
                     console.error('Errore esportazione database:', error);
-                    this.mostraNotifica('Errore durante l\'esportazione', 'error');
+                    this.mostraNotifica('Errore durante l\'esportazione del database', 'error');
                 }
             }
 
-            // Aggiorna informazioni database
+            // Aggiorna informazioni database nell'interfaccia
             aggiornaInfoDatabase() {
                 const infoDiv = document.getElementById('database-info');
                 infoDiv.style.display = 'block';
+
                 document.getElementById('db-filename').textContent = this.nomeDatabase;
                 document.getElementById('db-count').textContent = this.database.length;
                 document.getElementById('db-next-id').textContent = this.prossimoID.toString().padStart(3, '0');
             }
 
+            // Carica immagine di sfondo
+            async caricaSfondo(file) {
+                if (!file) return;
+
+                try {
+                    this.sfondoBase64 = await this.fileToBase64(file);
+                    this.aggiornaPreview();
+                    this.mostraNotifica('Immagine di sfondo caricata', 'success');
+                } catch (error) {
+                    console.error('Errore caricamento sfondo:', error);
+                    this.mostraNotifica('Errore durante il caricamento dell\'immagine', 'error');
+                }
+            }
+
             // Carica QR code
             async caricaQR(file) {
                 if (!file) return;
+
                 try {
                     this.qrBase64 = await this.fileToBase64(file);
                     this.aggiornaPreview();
                     this.mostraNotifica('QR Code caricato', 'success');
                 } catch (error) {
                     console.error('Errore caricamento QR:', error);
-                    this.mostraNotifica('Errore durante il caricamento del QR', 'error');
+                    this.mostraNotifica('Errore durante il caricamento del QR Code', 'error');
                 }
             }
 
@@ -1043,12 +978,14 @@
                 });
             }
 
-            // Calcola data scadenza
+            // Calcola data scadenza (+365 giorni)
             calcolaScadenza() {
                 const dataEmissione = document.getElementById('data-emissione-input').valueAsDate;
+
                 if (dataEmissione) {
                     const dataScadenza = new Date(dataEmissione);
                     dataScadenza.setDate(dataScadenza.getDate() + 365);
+
                     document.getElementById('data-scadenza-input').valueAsDate = dataScadenza;
                     this.aggiornaPreview();
                 }
@@ -1060,6 +997,7 @@
                 const cognome = document.getElementById('cognome-input').value;
                 const dataScadenza = document.getElementById('data-scadenza-input').value;
 
+                // Mostra preview se ci sono dati
                 const previewContainer = document.getElementById('preview-container');
                 if (nome || cognome) {
                     previewContainer.classList.add('active');
@@ -1070,29 +1008,26 @@
 
                 // Aggiorna fronte
                 const fronteContent = document.getElementById('preview-fronte-content');
-                if (this.sfondoFronteBase64) {
-                    fronteContent.style.backgroundImage = `url(${this.sfondoFronteBase64})`;
+                if (this.sfondoBase64) {
+                    fronteContent.style.backgroundImage = `url(${this.sfondoBase64})`;
                 }
+
                 document.getElementById('preview-numero').textContent = this.prossimoID.toString().padStart(3, '0');
 
                 // Aggiorna retro
-                const retroContent = document.getElementById('preview-retro-content');
-                if (this.sfondoRetroBase64) {
-                    retroContent.style.backgroundImage = `url(${this.sfondoRetroBase64})`;
-                }
-
                 document.getElementById('preview-nome-retro').textContent = nome || '-';
                 document.getElementById('preview-cognome-retro').textContent = cognome || '-';
 
                 if (dataScadenza) {
                     const data = new Date(dataScadenza);
-                    document.getElementById('preview-scadenza-retro').textContent = data.toLocaleDateString('it-IT');
+                    const dataFormattata = data.toLocaleDateString('it-IT');
+                    document.getElementById('preview-scadenza-retro').textContent = dataFormattata;
                 }
 
                 // Aggiorna QR
                 const qrContainer = document.getElementById('preview-qr-container');
                 if (this.qrBase64) {
-                    qrContainer.style.display = 'flex';
+                    qrContainer.style.display = 'block';
                     document.getElementById('preview-qr-img').src = this.qrBase64;
                 } else {
                     qrContainer.style.display = 'none';
@@ -1110,20 +1045,24 @@
                     this.mostraNotifica('Inserisci il nome', 'warning');
                     return false;
                 }
+
                 if (!cognome) {
                     this.mostraNotifica('Inserisci il cognome', 'warning');
                     return false;
                 }
+
                 if (!dataEmissione || !dataScadenza) {
                     this.mostraNotifica('Le date sono obbligatorie', 'warning');
                     return false;
                 }
+
                 return true;
             }
 
             // Genera e salva nuovo abbonamento
             async generaAbbonamento() {
                 if (!this.validaForm()) return;
+
                 this.mostraLoading(true, 'Generazione abbonamento...');
 
                 try {
@@ -1132,29 +1071,37 @@
                     const dataEmissione = document.getElementById('data-emissione-input').value;
                     const dataScadenza = document.getElementById('data-scadenza-input').value;
 
+                    // Crea record abbonamento
                     const abbonamento = {
                         ID_Progressivo: this.prossimoID,
                         Nome: nome,
                         Cognome: cognome,
                         Data_Emissione: dataEmissione,
                         Data_Scadenza: dataScadenza,
-                        Sfondo_Fronte_Base64: this.sfondoFronteBase64 || '',
-                        Sfondo_Retro_Base64: this.sfondoRetroBase64 || '',
+                        Path_QRCode: this.qrBase64 ? `qrcodes/${nome}_${cognome}_${new Date().getFullYear()}.png` : '',
+                        Path_Immagine: this.sfondoBase64 ? 'stored' : '',
+                        Sfondo_Base64: this.sfondoBase64 || '',
                         QR_Base64: this.qrBase64 || ''
                     };
 
+                    // Aggiungi al database
                     this.database.push(abbonamento);
                     this.prossimoID++;
 
+                    // Aggiorna interfaccia
                     this.aggiornaInfoDatabase();
                     this.aggiornaGrigliaAbbonamenti();
+
+                    // Genera PDF
                     await this.generaPDFSingolo(abbonamento);
+
+                    // Reset form
                     this.resetForm();
 
-                    this.mostraNotifica(`Abbonamento N°${abbonamento.ID_Progressivo.toString().padStart(3, '0')} generato!`, 'success');
+                    this.mostraNotifica(`Abbonamento N°${abbonamento.ID_Progressivo.toString().padStart(3, '0')} generato con successo!`, 'success');
                 } catch (error) {
                     console.error('Errore generazione abbonamento:', error);
-                    this.mostraNotifica('Errore durante la generazione', 'error');
+                    this.mostraNotifica('Errore durante la generazione dell\'abbonamento', 'error');
                 } finally {
                     this.mostraLoading(false);
                 }
@@ -1170,24 +1117,48 @@
                         format: 'a4'
                     });
 
+                    // Crea tessera fronte
                     const fronteCanvas = await this.creaTesseraFronte(abbonamento);
                     const fronteImg = fronteCanvas.toDataURL('image/png');
 
+                    // Pagina 1: Fronte
                     const cardWidth = 85.6;
                     const cardHeight = 53.98;
-                    const marginX = (297 - cardWidth) / 2;
-                    const marginY = (210 - cardHeight) / 2;
+                    const marginX = (297 - cardWidth) / 2; // A4 landscape width = 297mm
+                    const marginY = (210 - cardHeight) / 2; // A4 landscape height = 210mm
 
                     pdf.addImage(fronteImg, 'PNG', marginX, marginY, cardWidth, cardHeight);
-                    this.aggiungiLineeTaglio(pdf, marginX, marginY, cardWidth, cardHeight);
 
+                    // Aggiungi linee di taglio
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.1);
+                    pdf.line(marginX - 5, marginY, marginX - 2, marginY); // Top-left
+                    pdf.line(marginX, marginY - 5, marginX, marginY - 2);
+                    pdf.line(marginX + cardWidth + 2, marginY, marginX + cardWidth + 5, marginY); // Top-right
+                    pdf.line(marginX + cardWidth, marginY - 5, marginX + cardWidth, marginY - 2);
+                    pdf.line(marginX - 5, marginY + cardHeight, marginX - 2, marginY + cardHeight); // Bottom-left
+                    pdf.line(marginX, marginY + cardHeight + 2, marginX, marginY + cardHeight + 5);
+                    pdf.line(marginX + cardWidth + 2, marginY + cardHeight, marginX + cardWidth + 5, marginY + cardHeight); // Bottom-right
+                    pdf.line(marginX + cardWidth, marginY + cardHeight + 2, marginX + cardWidth, marginY + cardHeight + 5);
+
+                    // Pagina 2: Retro
                     const retroCanvas = await this.creaTesseraRetro(abbonamento);
                     const retroImg = retroCanvas.toDataURL('image/png');
 
                     pdf.addPage();
                     pdf.addImage(retroImg, 'PNG', marginX, marginY, cardWidth, cardHeight);
-                    this.aggiungiLineeTaglio(pdf, marginX, marginY, cardWidth, cardHeight);
 
+                    // Aggiungi linee di taglio retro
+                    pdf.line(marginX - 5, marginY, marginX - 2, marginY);
+                    pdf.line(marginX, marginY - 5, marginX, marginY - 2);
+                    pdf.line(marginX + cardWidth + 2, marginY, marginX + cardWidth + 5, marginY);
+                    pdf.line(marginX + cardWidth, marginY - 5, marginX + cardWidth, marginY - 2);
+                    pdf.line(marginX - 5, marginY + cardHeight, marginX - 2, marginY + cardHeight);
+                    pdf.line(marginX, marginY + cardHeight + 2, marginX, marginY + cardHeight + 5);
+                    pdf.line(marginX + cardWidth + 2, marginY + cardHeight, marginX + cardWidth + 5, marginY + cardHeight);
+                    pdf.line(marginX + cardWidth, marginY + cardHeight + 2, marginX + cardWidth, marginY + cardHeight + 5);
+
+                    // Salva PDF
                     const filename = `Abbonamento_${abbonamento.ID_Progressivo.toString().padStart(3, '0')}_${abbonamento.Nome}_${abbonamento.Cognome}.pdf`;
                     pdf.save(filename);
                 } catch (error) {
@@ -1196,24 +1167,10 @@
                 }
             }
 
-            // Aggiungi linee di taglio al PDF
-            aggiungiLineeTaglio(pdf, x, y, w, h) {
-                pdf.setDrawColor(200, 200, 200);
-                pdf.setLineWidth(0.1);
-                pdf.line(x - 5, y, x - 2, y);
-                pdf.line(x, y - 5, x, y - 2);
-                pdf.line(x + w + 2, y, x + w + 5, y);
-                pdf.line(x + w, y - 5, x + w, y - 2);
-                pdf.line(x - 5, y + h, x - 2, y + h);
-                pdf.line(x, y + h + 2, x, y + h + 5);
-                pdf.line(x + w + 2, y + h, x + w + 5, y + h);
-                pdf.line(x + w, y + h + 2, x + w, y + h + 5);
-            }
-
             // Crea tessera fronte come canvas
             async creaTesseraFronte(abbonamento) {
                 const canvas = document.createElement('canvas');
-                const dpi = 300;
+                const dpi = 300; // 300 DPI per stampa di qualità
                 const mmToPx = dpi / 25.4;
 
                 canvas.width = 85.6 * mmToPx;
@@ -1222,13 +1179,14 @@
                 const ctx = canvas.getContext('2d');
 
                 // Sfondo
-                if (abbonamento.Sfondo_Fronte_Base64) {
-                    const img = await this.caricaImmagine(abbonamento.Sfondo_Fronte_Base64);
+                if (abbonamento.Sfondo_Base64) {
+                    const img = await this.caricaImmagine(abbonamento.Sfondo_Base64);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 } else {
+                    // Sfondo gradiente di default
                     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-                    gradient.addColorStop(0, '#1a73e8');
-                    gradient.addColorStop(1, '#1557b0');
+                    gradient.addColorStop(0, '#2196F3');
+                    gradient.addColorStop(1, '#1976D2');
                     ctx.fillStyle = gradient;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
@@ -1261,26 +1219,35 @@
 
                 const ctx = canvas.getContext('2d');
 
-                // Sfondo
-                if (abbonamento.Sfondo_Retro_Base64) {
-                    const img = await this.caricaImmagine(abbonamento.Sfondo_Retro_Base64);
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                } else {
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                }
+                // Sfondo bianco
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 const padding = 15 * mmToPx;
+                let yPos = padding;
+
+                // Header
+                ctx.fillStyle = '#2196F3';
+                ctx.fillRect(0, yPos, canvas.width, 2 * mmToPx);
+                yPos += 10 * mmToPx;
+
+                ctx.font = `bold ${7 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.fillStyle = '#2196F3';
+                ctx.textAlign = 'center';
+                ctx.fillText('ABBONAMENTO', canvas.width / 2, yPos);
+                yPos += 12 * mmToPx;
+
+                // Calcolo posizione QR (a destra)
                 const qrSize = 26 * mmToPx;
                 const qrX = canvas.width - qrSize - padding;
-                const centerY = canvas.height / 2;
+                const qrYCenter = yPos + (canvas.height - yPos - padding) / 2;
 
                 // Informazioni (a sinistra)
                 ctx.font = `bold ${7 * mmToPx / 25.4}px "Segoe UI", Arial`;
-                ctx.fillStyle = '#202124';
+                ctx.fillStyle = '#212121';
                 ctx.textAlign = 'left';
 
-                const textStartY = centerY - (7 * mmToPx);
+                const textStartY = qrYCenter - (7 * mmToPx);
 
                 ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, textStartY);
                 ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (7 * mmToPx));
@@ -1289,19 +1256,20 @@
                 const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
                 ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (14 * mmToPx));
 
-                // QR Code (a destra)
+                // QR Code (a destra, centrato verticalmente)
                 if (abbonamento.QR_Base64) {
                     try {
                         const qrImg = await this.caricaImmagine(abbonamento.QR_Base64);
-                        const qrY = centerY - (qrSize / 2);
+                        const qrY = qrYCenter - (qrSize / 2);
 
-                        ctx.strokeStyle = '#1a73e8';
+                        // Bordo QR
+                        ctx.strokeStyle = '#2196F3';
                         ctx.lineWidth = 2 * mmToPx / 25.4;
                         ctx.strokeRect(qrX - 2, qrY - 2, qrSize + 4, qrSize + 4);
 
                         ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
                     } catch (error) {
-                        console.error('Errore caricamento QR:', error);
+                        console.error('Errore caricamento QR nel canvas:', error);
                     }
                 }
 
@@ -1322,14 +1290,20 @@
             resetForm() {
                 document.getElementById('nome-input').value = '';
                 document.getElementById('cognome-input').value = '';
+                document.getElementById('sfondo-input').value = '';
                 document.getElementById('qr-input').value = '';
 
                 const oggi = new Date();
                 document.getElementById('data-emissione-input').valueAsDate = oggi;
                 this.calcolaScadenza();
 
+                this.sfondoBase64 = null;
                 this.qrBase64 = null;
+
                 document.getElementById('preview-container').classList.remove('active');
+
+                // Reset preview sfondo
+                document.getElementById('preview-fronte-content').style.backgroundImage = '';
             }
 
             // Aggiorna griglia abbonamenti
@@ -1342,6 +1316,8 @@
                 }
 
                 grid.innerHTML = '';
+
+                // Ordina per ID decrescente (più recenti prima)
                 const abbonamenti = [...this.database].sort((a, b) => b.ID_Progressivo - a.ID_Progressivo);
 
                 abbonamenti.forEach(abb => {
@@ -1368,7 +1344,7 @@
                         <p>Emissione: ${new Date(abbonamento.Data_Emissione).toLocaleDateString('it-IT')}</p>
                         <p>Scadenza: ${dataScadenza.toLocaleDateString('it-IT')}</p>
                         <span class="abbonamento-badge ${isScaduto ? 'badge-scaduto' : 'badge-attivo'}">
-                            ${isScaduto ? 'Scaduto' : 'Attivo'}
+                            ${isScaduto ? '❌ Scaduto' : '✅ Attivo'}
                         </span>
                     </div>
                 `;
@@ -1390,6 +1366,7 @@
                     this.abbonamentiSelezionati.add(id);
                     document.querySelector(`[data-id="${id}"]`).classList.add('selected');
                 }
+
                 this.aggiornaContatoreSelezioni();
             }
 
@@ -1415,9 +1392,14 @@
             // Cerca abbonamenti
             cercaAbbonamenti() {
                 const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
                 document.querySelectorAll('.abbonamento-card').forEach(card => {
                     const text = card.textContent.toLowerCase();
-                    card.style.display = text.includes(searchTerm) ? 'block' : 'none';
+                    if (text.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
                 });
             }
 
@@ -1441,7 +1423,7 @@
                         await this.generaPDFMultiplo(abbonamenti);
                     }
 
-                    this.mostraNotifica(`PDF generato per ${abbonamenti.length} tessera/e`, 'success');
+                    this.mostraNotifica(`PDF generato con successo per ${abbonamenti.length} tessera/e`, 'success');
                 } catch (error) {
                     console.error('Errore stampa abbonamenti:', error);
                     this.mostraNotifica('Errore durante la generazione del PDF', 'error');
@@ -1450,7 +1432,7 @@
                 }
             }
 
-            // Genera PDF multiplo
+            // Genera PDF multiplo (griglia 2x2)
             async generaPDFMultiplo(abbonamenti) {
                 try {
                     const { jsPDF } = window.jspdf;
@@ -1463,18 +1445,21 @@
                     const cardWidth = 85.6;
                     const cardHeight = 53.98;
                     const spacing = 10;
-                    const startX = (210 - (cardWidth * 2 + spacing)) / 2;
+                    const startX = (210 - (cardWidth * 2 + spacing)) / 2; // A4 width = 210mm
                     const startY = 20;
 
+                    // Raggruppa per pagina (max 4 tessere per pagina, 2 per tipo)
                     for (let i = 0; i < abbonamenti.length; i += 2) {
                         if (i > 0) pdf.addPage();
 
                         const batch = abbonamenti.slice(i, i + 2);
 
+                        // Titolo pagina
                         pdf.setFontSize(14);
-                        pdf.setTextColor(26, 115, 232);
+                        pdf.setTextColor(33, 150, 243);
                         pdf.text('Tessere Abbonamento - Fronte', 105, 10, { align: 'center' });
 
+                        // Fronte tessere
                         for (let j = 0; j < batch.length; j++) {
                             const abb = batch[j];
                             const fronteCanvas = await this.creaTesseraFronte(abb);
@@ -1484,13 +1469,22 @@
                             const y = startY + (j * (cardHeight + spacing));
 
                             pdf.addImage(fronteImg, 'PNG', x, y, cardWidth, cardHeight);
-                            this.aggiungiLineeTaglio(pdf, x, y, cardWidth, cardHeight);
+
+                            // Linee di taglio
+                            pdf.setDrawColor(200, 200, 200);
+                            pdf.setLineWidth(0.1);
+                            pdf.line(x - 3, y, x - 1, y);
+                            pdf.line(x, y - 3, x, y - 1);
+                            pdf.line(x + cardWidth + 1, y, x + cardWidth + 3, y);
+                            pdf.line(x + cardWidth, y - 3, x + cardWidth, y - 1);
                         }
 
+                        // Aggiungi pagina retro
                         pdf.addPage();
                         pdf.setFontSize(14);
                         pdf.text('Tessere Abbonamento - Retro', 105, 10, { align: 'center' });
 
+                        // Retro tessere
                         for (let j = 0; j < batch.length; j++) {
                             const abb = batch[j];
                             const retroCanvas = await this.creaTesseraRetro(abb);
@@ -1500,10 +1494,18 @@
                             const y = startY + (j * (cardHeight + spacing));
 
                             pdf.addImage(retroImg, 'PNG', x, y, cardWidth, cardHeight);
-                            this.aggiungiLineeTaglio(pdf, x, y, cardWidth, cardHeight);
+
+                            // Linee di taglio
+                            pdf.setDrawColor(200, 200, 200);
+                            pdf.setLineWidth(0.1);
+                            pdf.line(x - 3, y, x - 1, y);
+                            pdf.line(x, y - 3, x, y - 1);
+                            pdf.line(x + cardWidth + 1, y, x + cardWidth + 3, y);
+                            pdf.line(x + cardWidth, y - 3, x + cardWidth, y - 1);
                         }
                     }
 
+                    // Salva PDF
                     const timestamp = new Date().toISOString().split('T')[0];
                     const filename = `Abbonamenti_Multipli_${timestamp}.pdf`;
                     pdf.save(filename);
