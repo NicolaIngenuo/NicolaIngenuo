@@ -265,10 +265,10 @@
             position: absolute;
             bottom: 15px;
             right: 20px;
-            font-size: 24px;
+            font-size: 42px;
             font-weight: bold;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: black;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
             font-family: 'Courier New', monospace;
         }
 
@@ -277,10 +277,9 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
         }
 
         .tessera-header {
@@ -298,15 +297,24 @@
         .tessera-info {
             flex: 1;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 8px;
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
         }
 
-        .tessera-info p {
-            font-size: 0.95rem;
+        .tessera-info-text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .tessera-info-text p {
+            font-size: 0.8rem;
             color: var(--text-primary);
-            margin: 4px 0;
+            margin: 2px 0;
         }
 
         .tessera-info strong {
@@ -314,14 +322,16 @@
         }
 
         .tessera-qr {
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .tessera-qr img {
-            width: 80px;
-            height: 80px;
+            width: 60px;
+            height: 60px;
             border: 2px solid var(--primary-color);
-            border-radius: 8px;
+            border-radius: 6px;
         }
 
         /* Sezione Ristampa */
@@ -707,12 +717,14 @@
                                         <h3>ABBONAMENTO</h3>
                                     </div>
                                     <div class="tessera-info">
-                                        <p><strong>Nome:</strong> <span id="preview-nome-retro">-</span></p>
-                                        <p><strong>Cognome:</strong> <span id="preview-cognome-retro">-</span></p>
-                                        <p><strong>Valido fino al:</strong> <span id="preview-scadenza-retro">-</span></p>
-                                    </div>
-                                    <div class="tessera-qr" id="preview-qr-container" style="display: none;">
-                                        <img id="preview-qr-img" src="" alt="QR Code">
+                                        <div class="tessera-info-text">
+                                            <p><strong>Nome:</strong> <span id="preview-nome-retro">-</span></p>
+                                            <p><strong>Cognome:</strong> <span id="preview-cognome-retro">-</span></p>
+                                            <p><strong>Valido fino al:</strong> <span id="preview-scadenza-retro">-</span></p>
+                                        </div>
+                                        <div class="tessera-qr" id="preview-qr-container" style="display: none;">
+                                            <img id="preview-qr-img" src="" alt="QR Code">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -925,7 +937,7 @@
 
                 document.getElementById('db-filename').textContent = this.nomeDatabase;
                 document.getElementById('db-count').textContent = this.database.length;
-                document.getElementById('db-next-id').textContent = this.prossimoID.toString().padStart(4, '0');
+                document.getElementById('db-next-id').textContent = this.prossimoID.toString().padStart(3, '0');
             }
 
             // Carica immagine di sfondo
@@ -1000,7 +1012,7 @@
                     fronteContent.style.backgroundImage = `url(${this.sfondoBase64})`;
                 }
 
-                document.getElementById('preview-numero').textContent = this.prossimoID.toString().padStart(4, '0');
+                document.getElementById('preview-numero').textContent = this.prossimoID.toString().padStart(3, '0');
 
                 // Aggiorna retro
                 document.getElementById('preview-nome-retro').textContent = nome || '-';
@@ -1086,7 +1098,7 @@
                     // Reset form
                     this.resetForm();
 
-                    this.mostraNotifica(`Abbonamento N°${abbonamento.ID_Progressivo.toString().padStart(4, '0')} generato con successo!`, 'success');
+                    this.mostraNotifica(`Abbonamento N°${abbonamento.ID_Progressivo.toString().padStart(3, '0')} generato con successo!`, 'success');
                 } catch (error) {
                     console.error('Errore generazione abbonamento:', error);
                     this.mostraNotifica('Errore durante la generazione dell\'abbonamento', 'error');
@@ -1147,7 +1159,7 @@
                     pdf.line(marginX + cardWidth, marginY + cardHeight + 2, marginX + cardWidth, marginY + cardHeight + 5);
 
                     // Salva PDF
-                    const filename = `Abbonamento_${abbonamento.ID_Progressivo.toString().padStart(4, '0')}_${abbonamento.Nome}_${abbonamento.Cognome}.pdf`;
+                    const filename = `Abbonamento_${abbonamento.ID_Progressivo.toString().padStart(3, '0')}_${abbonamento.Nome}_${abbonamento.Cognome}.pdf`;
                     pdf.save(filename);
                 } catch (error) {
                     console.error('Errore generazione PDF:', error);
@@ -1180,17 +1192,17 @@
                 }
 
                 // Numero progressivo
-                ctx.font = `bold ${24 * mmToPx / 25.4}px "Courier New", monospace`;
-                ctx.fillStyle = 'white';
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                ctx.shadowBlur = 4 * mmToPx / 25.4;
-                ctx.shadowOffsetX = 2 * mmToPx / 25.4;
-                ctx.shadowOffsetY = 2 * mmToPx / 25.4;
+                ctx.font = `bold ${11 * mmToPx}px "Courier New", monospace`;
+                ctx.fillStyle = 'black';
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
+                ctx.shadowBlur = 2 * mmToPx / 25.4;
+                ctx.shadowOffsetX = 1 * mmToPx / 25.4;
+                ctx.shadowOffsetY = 1 * mmToPx / 25.4;
                 ctx.textAlign = 'right';
                 ctx.fillText(
-                    abbonamento.ID_Progressivo.toString().padStart(4, '0'),
-                    canvas.width - (20 * mmToPx),
-                    canvas.height - (15 * mmToPx)
+                    abbonamento.ID_Progressivo.toString().padStart(3, '0'),
+                    canvas.width - (10 * mmToPx),
+                    canvas.height - (10 * mmToPx)
                 );
 
                 return canvas;
@@ -1214,43 +1226,44 @@
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                const padding = 20 * mmToPx;
+                const padding = 15 * mmToPx;
                 let yPos = padding;
 
                 // Header
                 ctx.fillStyle = '#2196F3';
                 ctx.fillRect(0, yPos, canvas.width, 2 * mmToPx);
-                yPos += 15 * mmToPx;
+                yPos += 10 * mmToPx;
 
-                ctx.font = `bold ${12 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.font = `bold ${10 * mmToPx / 25.4}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#2196F3';
                 ctx.textAlign = 'center';
                 ctx.fillText('ABBONAMENTO', canvas.width / 2, yPos);
-                yPos += 20 * mmToPx;
+                yPos += 12 * mmToPx;
 
-                // Informazioni
-                ctx.font = `${9.5 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                // Calcolo posizione QR (a destra)
+                const qrSize = 20 * mmToPx;
+                const qrX = canvas.width - qrSize - padding;
+                const qrYCenter = yPos + (canvas.height - yPos - padding) / 2;
+
+                // Informazioni (a sinistra)
+                ctx.font = `bold ${7 * mmToPx / 25.4}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#212121';
                 ctx.textAlign = 'left';
 
-                ctx.font = `bold ${9.5 * mmToPx / 25.4}px "Segoe UI", Arial`;
-                ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, yPos);
-                yPos += 12 * mmToPx;
+                const textStartY = qrYCenter - (7 * mmToPx);
 
-                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, yPos);
-                yPos += 12 * mmToPx;
+                ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, textStartY);
+                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (7 * mmToPx));
 
                 const dataScadenza = new Date(abbonamento.Data_Scadenza);
                 const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
-                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, yPos);
+                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (14 * mmToPx));
 
-                // QR Code
+                // QR Code (a destra, centrato verticalmente)
                 if (abbonamento.QR_Base64) {
                     try {
                         const qrImg = await this.caricaImmagine(abbonamento.QR_Base64);
-                        const qrSize = 25 * mmToPx;
-                        const qrX = (canvas.width - qrSize) / 2;
-                        const qrY = canvas.height - qrSize - (15 * mmToPx);
+                        const qrY = qrYCenter - (qrSize / 2);
 
                         // Bordo QR
                         ctx.strokeStyle = '#2196F3';
@@ -1329,7 +1342,7 @@
                 card.innerHTML = `
                     <input type="checkbox" onchange="app.toggleSelezione(${abbonamento.ID_Progressivo})">
                     <div class="abbonamento-info">
-                        <h4>N° ${abbonamento.ID_Progressivo.toString().padStart(4, '0')}</h4>
+                        <h4>N° ${abbonamento.ID_Progressivo.toString().padStart(3, '0')}</h4>
                         <p><strong>${abbonamento.Nome} ${abbonamento.Cognome}</strong></p>
                         <p>Emissione: ${new Date(abbonamento.Data_Emissione).toLocaleDateString('it-IT')}</p>
                         <p>Scadenza: ${dataScadenza.toLocaleDateString('it-IT')}</p>
