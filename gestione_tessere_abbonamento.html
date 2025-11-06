@@ -1171,7 +1171,10 @@
                 }
             }
 
-            // Carica database da file
+            // Carica database da file Excel
+            // IMPORTANTE: Il database importato contiene tutti i campi incluso QR_Code_Data
+            // Gli sfondi Base64 non sono nel file Excel (troppo grandi), ma verranno usati
+            // quelli caricati globalmente durante la stampa
             async caricaDatabase(file) {
                 if (!file) return;
                 this.mostraLoading(true, 'Caricamento database...');
@@ -1179,13 +1182,18 @@
                 try {
                     const data = await this.leggiFileExcel(file);
                     if (data && data.length > 0) {
+                        // sheet_to_json legge TUTTI i campi dal file Excel
+                        // Quindi QR_Code_Data viene automaticamente importato
                         this.database = data;
                         this.nomeDatabase = file.name;
                         const maxID = Math.max(...data.map(a => parseInt(a.ID_Progressivo) || 0), 0);
                         this.prossimoID = maxID + 1;
                         this.aggiornaInfoDatabase();
                         this.aggiornaGrigliaAbbonamenti();
-                        this.mostraNotifica(`Database caricato: ${data.length} abbonamenti`, 'success');
+
+                        // Conta quanti abbonamenti hanno QR code
+                        const conQR = data.filter(a => a.QR_Code_Data && a.QR_Code_Data.trim() !== '').length;
+                        this.mostraNotifica(`Database caricato: ${data.length} abbonamenti${conQR > 0 ? ` (${conQR} con QR code)` : ''}`, 'success');
                         document.getElementById('btn-export').disabled = false;
                     } else {
                         throw new Error('Database vuoto o formato non valido');
@@ -1219,7 +1227,9 @@
                 });
             }
 
-            // Esporta database
+            // Esporta database in Excel
+            // IMPORTANTE: QR_Code_Data (l'URL del QR) viene SEMPRE esportato
+            // Quando ricarichi questo file Excel, potrai ristampare con i QR code originali
             esportaDatabase() {
                 try {
                     if (this.database.length === 0) {
@@ -1227,8 +1237,9 @@
                         return;
                     }
 
-                    // Crea copia del database senza i campi Base64 (troppo grandi per Excel)
-                    // QR_Code_Data viene mantenuto perché contiene solo il testo/URL (non l'immagine)
+                    // Crea copia del database senza i campi Base64 immagini (troppo grandi per Excel)
+                    // ✓ QR_Code_Data viene MANTENUTO perché contiene solo il testo/URL (pochi byte)
+                    // ✗ Sfondo_Fronte_Base64 e Sfondo_Retro_Base64 vengono ESCLUSI (troppo grandi)
                     const databaseExport = this.database.map(abbonamento => {
                         const {Sfondo_Fronte_Base64, Sfondo_Retro_Base64, ...resto} = abbonamento;
                         return {
@@ -1243,7 +1254,9 @@
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, 'Abbonamenti');
                     XLSX.writeFile(workbook, this.nomeDatabase);
-                    this.mostraNotifica('Database esportato con successo! (QR_Code_Data incluso)', 'success');
+
+                    const conQR = this.database.filter(a => a.QR_Code_Data && a.QR_Code_Data.trim() !== '').length;
+                    this.mostraNotifica(`Database esportato! ${conQR} abbonamenti con QR code salvati`, 'success');
                 } catch (error) {
                     console.error('Errore esportazione database:', error);
                     this.mostraNotifica('Errore durante l\'esportazione', 'error');
@@ -1847,6 +1860,8 @@
                 const oggi = new Date();
                 const isScaduto = dataScadenza < oggi;
 
+                const hasQR = abbonamento.QR_Code_Data && abbonamento.QR_Code_Data.trim() !== '';
+
                 card.innerHTML = `
                     <input type="checkbox" onchange="app.toggleSelezione(${abbonamento.ID_Progressivo})">
                     <div class="abbonamento-info">
@@ -1854,9 +1869,19 @@
                         <p><strong>${abbonamento.Nome} ${abbonamento.Cognome}</strong></p>
                         <p>Emissione: ${new Date(abbonamento.Data_Emissione).toLocaleDateString('it-IT')}</p>
                         <p>Scadenza: ${dataScadenza.toLocaleDateString('it-IT')}</p>
-                        <span class="abbonamento-badge ${isScaduto ? 'badge-scaduto' : 'badge-attivo'}">
-                            ${isScaduto ? 'Scaduto' : 'Attivo'}
-                        </span>
+                        <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                            <span class="abbonamento-badge ${isScaduto ? 'badge-scaduto' : 'badge-attivo'}">
+                                ${isScaduto ? 'Scaduto' : 'Attivo'}
+                            </span>
+                            ${hasQR ? `
+                                <span class="abbonamento-badge" style="background: #34a853; color: white; font-size: 11px;" title="${abbonamento.QR_Code_Data}">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" style="width: 12px; height: 12px; vertical-align: middle; margin-right: 2px;">
+                                        <path d="M3 11h8V3H3m2-2h4v4H5M3 21h8v-8H3m2-2h4v4H5m8-16v8h8V3m-2 2h-4v4h4M19 19h2v2h-2m-2-2h2v2h-2m-2-2h2v2h-2m0-4h2v2h-2m-2 0h2v2h-2m2-4h2v2h-2m0 0h-2v-2h2m0-2v2h-2m-4 6h2v2h-2m0-4h2v2h-2m0 4h2v2h-2"/>
+                                    </svg>
+                                    QR
+                                </span>
+                            ` : ''}
+                        </div>
                     </div>
                 `;
 
