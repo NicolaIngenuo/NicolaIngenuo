@@ -9,6 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
     <style>
         /* Reset e Base Styles */
@@ -838,7 +840,8 @@
                 this.nomeDatabase = 'database_abbonamenti.xlsx';
                 this.sfondoFronteBase64 = null;
                 this.sfondoRetroBase64 = null;
-                this.qrBase64 = null;
+                this.qrCodeData = null;  // Contenuto decodificato del QR (URL o testo)
+                this.qrPreviewImage = null;  // Immagine del QR per l'anteprima
                 this.abbonamentiSelezionati = new Set();
                 this.init();
             }
@@ -1062,14 +1065,14 @@
                     }
 
                     // Crea copia del database senza i campi Base64 (troppo grandi per Excel)
+                    // QR_Code_Data viene mantenuto perché contiene solo il testo/URL (non l'immagine)
                     const databaseExport = this.database.map(abbonamento => {
-                        const {Sfondo_Fronte_Base64, Sfondo_Retro_Base64, QR_Base64, ...resto} = abbonamento;
+                        const {Sfondo_Fronte_Base64, Sfondo_Retro_Base64, ...resto} = abbonamento;
                         return {
                             ...resto,
-                            // Aggiungi flag per indicare presenza immagini
+                            // Aggiungi flag per indicare presenza sfondi
                             Ha_Sfondo_Fronte: !!Sfondo_Fronte_Base64,
-                            Ha_Sfondo_Retro: !!Sfondo_Retro_Base64,
-                            Ha_QR_Code: !!QR_Base64
+                            Ha_Sfondo_Retro: !!Sfondo_Retro_Base64
                         };
                     });
 
@@ -1077,7 +1080,7 @@
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, 'Abbonamenti');
                     XLSX.writeFile(workbook, this.nomeDatabase);
-                    this.mostraNotifica('Database esportato con successo! (Le immagini Base64 non sono incluse)', 'success');
+                    this.mostraNotifica('Database esportato con successo! (QR_Code_Data incluso)', 'success');
                 } catch (error) {
                     console.error('Errore esportazione database:', error);
                     this.mostraNotifica('Errore durante l\'esportazione', 'error');
@@ -1119,16 +1122,42 @@
                 }
             }
 
-            // Carica QR code
+            // Carica e decodifica QR code
             async caricaQR(file) {
                 if (!file) return;
                 try {
-                    this.qrBase64 = await this.fileToBase64(file);
-                    this.aggiornaPreview();
-                    this.mostraNotifica('QR Code caricato', 'success');
+                    this.mostraLoading(true, 'Decodifica QR code...');
+
+                    // Carica l'immagine
+                    const base64 = await this.fileToBase64(file);
+                    const img = await this.caricaImmagine(base64);
+
+                    // Crea canvas per decodifica
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+
+                    // Ottieni i dati dell'immagine
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                    // Decodifica con jsQR
+                    const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (qrCode && qrCode.data) {
+                        this.qrCodeData = qrCode.data;  // Salva il contenuto decodificato
+                        this.qrPreviewImage = base64;   // Salva immagine per anteprima
+                        this.aggiornaPreview();
+                        this.mostraNotifica(`QR Code decodificato: ${qrCode.data.substring(0, 50)}${qrCode.data.length > 50 ? '...' : ''}`, 'success');
+                    } else {
+                        throw new Error('Impossibile decodificare il QR code');
+                    }
                 } catch (error) {
                     console.error('Errore caricamento QR:', error);
-                    this.mostraNotifica('Errore durante il caricamento del QR', 'error');
+                    this.mostraNotifica('Errore: ' + error.message, 'error');
+                } finally {
+                    this.mostraLoading(false);
                 }
             }
 
@@ -1190,9 +1219,9 @@
 
                 // Aggiorna QR
                 const qrContainer = document.getElementById('preview-qr-container');
-                if (this.qrBase64) {
+                if (this.qrPreviewImage) {
                     qrContainer.style.display = 'flex';
-                    document.getElementById('preview-qr-img').src = this.qrBase64;
+                    document.getElementById('preview-qr-img').src = this.qrPreviewImage;
                 } else {
                     qrContainer.style.display = 'none';
                 }
@@ -1239,7 +1268,7 @@
                         Data_Scadenza: dataScadenza,
                         Sfondo_Fronte_Base64: this.sfondoFronteBase64 || '',
                         Sfondo_Retro_Base64: this.sfondoRetroBase64 || '',
-                        QR_Base64: this.qrBase64 || ''
+                        QR_Code_Data: this.qrCodeData || ''  // Salva il contenuto decodificato, non l'immagine
                     };
 
                     this.database.push(abbonamento);
@@ -1346,7 +1375,7 @@
             }
 
             // Crea tessera fronte come canvas
-            async creaTesseraFronte(abbonamento) {
+            async creaTesseraFronte(abbonamento, useSfondoUnificato = false) {
                 const canvas = document.createElement('canvas');
                 const dpi = 300;
                 const mmToPx = dpi / 25.4;
@@ -1356,9 +1385,11 @@
 
                 const ctx = canvas.getContext('2d');
 
-                // Sfondo
-                if (abbonamento.Sfondo_Fronte_Base64) {
-                    const img = await this.caricaImmagine(abbonamento.Sfondo_Fronte_Base64);
+                // Sfondo: usa quello unificato se richiesto, altrimenti quello dell'abbonamento
+                const sfondoFronte = useSfondoUnificato ? this.sfondoFronteBase64 : abbonamento.Sfondo_Fronte_Base64;
+
+                if (sfondoFronte) {
+                    const img = await this.caricaImmagine(sfondoFronte);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 } else {
                     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -1387,7 +1418,7 @@
             }
 
             // Crea tessera retro come canvas
-            async creaTesseraRetro(abbonamento) {
+            async creaTesseraRetro(abbonamento, useSfondoUnificato = false) {
                 const canvas = document.createElement('canvas');
                 const dpi = 300;
                 const mmToPx = dpi / 25.4;
@@ -1397,9 +1428,11 @@
 
                 const ctx = canvas.getContext('2d');
 
-                // Sfondo
-                if (abbonamento.Sfondo_Retro_Base64) {
-                    const img = await this.caricaImmagine(abbonamento.Sfondo_Retro_Base64);
+                // Sfondo: usa quello unificato se richiesto, altrimenti quello dell'abbonamento
+                const sfondoRetro = useSfondoUnificato ? this.sfondoRetroBase64 : abbonamento.Sfondo_Retro_Base64;
+
+                if (sfondoRetro) {
+                    const img = await this.caricaImmagine(sfondoRetro);
                     ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 } else {
                     ctx.fillStyle = 'white';
@@ -1425,10 +1458,12 @@
                 const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
                 ctx.fillText(`Valido fino al: ${dataFormattata}`, leftMargin, textStartY + (12 * mmToPx));
 
-                // QR Code (a destra)
-                if (abbonamento.QR_Base64) {
+                // QR Code (a destra) - Rigenera da QR_Code_Data
+                if (abbonamento.QR_Code_Data) {
                     try {
-                        const qrImg = await this.caricaImmagine(abbonamento.QR_Base64);
+                        // Rigenera il QR code dal contenuto salvato
+                        const qrBase64 = await this.generaQRCode(abbonamento.QR_Code_Data, qrSize);
+                        const qrImg = await this.caricaImmagine(qrBase64);
                         const qrY = centerY - (qrSize / 2);
 
                         ctx.strokeStyle = '#1a73e8';
@@ -1437,7 +1472,7 @@
 
                         ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
                     } catch (error) {
-                        console.error('Errore caricamento QR:', error);
+                        console.error('Errore generazione QR:', error);
                     }
                 }
 
@@ -1454,6 +1489,47 @@
                 });
             }
 
+            // Genera QR code come immagine Base64 dal contenuto
+            generaQRCode(data, size = 256) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        if (!data) {
+                            reject(new Error('Nessun dato per il QR code'));
+                            return;
+                        }
+
+                        // Crea QR code con qrcode-generator
+                        const qr = qrcode(0, 'M');  // Type 0 (auto), error correction M
+                        qr.addData(data);
+                        qr.make();
+
+                        // Crea canvas per disegnare il QR
+                        const canvas = document.createElement('canvas');
+                        const moduleCount = qr.getModuleCount();
+                        const cellSize = Math.ceil(size / moduleCount);
+                        canvas.width = cellSize * moduleCount;
+                        canvas.height = cellSize * moduleCount;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        ctx.fillStyle = '#000000';
+                        for (let row = 0; row < moduleCount; row++) {
+                            for (let col = 0; col < moduleCount; col++) {
+                                if (qr.isDark(row, col)) {
+                                    ctx.fillRect(col * cellSize, row * cellSize, cellSize, cellSize);
+                                }
+                            }
+                        }
+
+                        resolve(canvas.toDataURL('image/png'));
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+
             // Reset form
             resetForm() {
                 document.getElementById('nome-input').value = '';
@@ -1466,7 +1542,8 @@
                 document.getElementById('data-emissione-input').valueAsDate = oggi;
                 this.calcolaScadenza();
 
-                this.qrBase64 = null;
+                this.qrCodeData = null;
+                this.qrPreviewImage = null;
                 // Non resetto gli sfondi perché potrebbero essere riutilizzati per più tessere
                 document.getElementById('preview-container').classList.remove('active');
             }
@@ -1684,7 +1761,8 @@
 
                     for (const mapping of frontMapping) {
                         const abbonamento = abbonamentiDaStampare[mapping.abb];
-                        const fronteCanvas = await this.creaTesseraFronte(abbonamento);
+                        // Usa sfondo unificato (quello caricato globalmente)
+                        const fronteCanvas = await this.creaTesseraFronte(abbonamento, true);
                         const fronteImg = fronteCanvas.toDataURL('image/png');
                         placeCardInQuadrant(mapping.quad, fronteImg, cardWidth, cardHeight);
                     }
@@ -1703,7 +1781,8 @@
 
                     for (const mapping of backMapping) {
                         const abbonamento = abbonamentiDaStampare[mapping.abb];
-                        const retroCanvas = await this.creaTesseraRetro(abbonamento);
+                        // Usa sfondo unificato (quello caricato globalmente) e rigenera QR codes
+                        const retroCanvas = await this.creaTesseraRetro(abbonamento, true);
                         const retroImg = retroCanvas.toDataURL('image/png');
                         placeCardInQuadrant(mapping.quad, retroImg, cardWidth, cardHeight);
                     }
