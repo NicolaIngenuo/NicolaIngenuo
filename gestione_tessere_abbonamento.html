@@ -47,14 +47,14 @@
         .container {
             max-width: 1600px;
             margin: 0 auto;
-            padding: 24px;
+            padding: 16px;
         }
 
         /* Header */
         .header {
             background: white;
-            padding: 32px;
-            margin-bottom: 24px;
+            padding: 20px;
+            margin-bottom: 16px;
             border-radius: 12px;
             box-shadow: var(--shadow-sm);
             border-left: 4px solid var(--primary);
@@ -63,42 +63,42 @@
         .header-content {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .header-icon {
-            width: 48px;
-            height: 48px;
+            width: 40px;
+            height: 40px;
             background: var(--primary-light);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .header-icon svg {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             fill: var(--primary);
         }
 
         .header-text h1 {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .header-text p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 0.875rem;
         }
 
         /* Main Grid */
         .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 16px;
         }
 
         @media (max-width: 1200px) {
@@ -111,7 +111,7 @@
         .card {
             background: white;
             border-radius: 12px;
-            padding: 24px;
+            padding: 16px;
             box-shadow: var(--shadow-sm);
             border: 1px solid var(--border);
         }
@@ -119,20 +119,20 @@
         .card-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .card-header svg {
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             fill: var(--primary);
         }
 
         .card-header h2 {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -143,25 +143,25 @@
 
         /* Form Groups */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 500;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.875rem;
         }
 
         .form-group input[type="text"],
         .form-group input[type="date"],
         .form-group input[type="file"] {
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 12px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-family: inherit;
             transition: all 0.2s;
             background: white;
@@ -180,23 +180,23 @@
 
         /* Buttons */
         .btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.875rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             font-family: inherit;
             text-decoration: none;
         }
 
         .btn svg {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
         }
 
         .btn-primary {
@@ -236,14 +236,14 @@
 
         .btn-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 16px;
+            margin-top: 12px;
         }
 
         /* Tessere Preview */
         .preview-container {
-            margin-top: 24px;
+            margin-top: 16px;
             display: none;
         }
 
@@ -253,16 +253,16 @@
 
         .preview-label {
             font-weight: 600;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 0.5px;
         }
 
         .card-preview {
             display: flex;
-            gap: 20px;
+            gap: 16px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -273,19 +273,19 @@
 
         .preview-item label {
             display: block;
-            margin-bottom: 8px;
-            font-size: 0.85rem;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             font-weight: 600;
         }
 
         /* Tessera - Formato Carta di Credito: 85.6mm x 53.98mm */
         .tessera {
-            width: 323.7px;
-            height: 204.1px;
+            width: 280px;
+            height: 176.5px;
             position: relative;
-            border-radius: 12px;
-            box-shadow: var(--shadow-lg);
+            border-radius: 10px;
+            box-shadow: var(--shadow-md);
             overflow: hidden;
             background: white;
         }
@@ -359,17 +359,17 @@
 
         /* Search Box */
         .search-box {
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .search-box input {
             width: 100%;
-            padding: 12px 16px 12px 44px;
+            padding: 10px 14px 10px 40px;
             border: 1px solid var(--border);
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: all 0.2s;
-            background: white url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%235f6368" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 12px center;
+            background: white url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="%235f6368" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>') no-repeat 12px center;
         }
 
         .search-box input:focus {
@@ -381,8 +381,8 @@
         /* Abbonamenti Grid */
         .abbonamenti-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 12px;
             max-height: 600px;
             overflow-y: auto;
             padding: 4px;
@@ -392,7 +392,7 @@
             background: white;
             border: 2px solid var(--border);
             border-radius: 10px;
-            padding: 16px;
+            padding: 12px;
             cursor: pointer;
             transition: all 0.2s;
             position: relative;
@@ -410,34 +410,36 @@
 
         .abbonamento-card input[type="checkbox"] {
             position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 20px;
-            height: 20px;
+            top: 12px;
+            right: 12px;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             accent-color: var(--success);
         }
 
         .abbonamento-info h4 {
             color: var(--text-primary);
-            margin-bottom: 8px;
-            font-size: 1rem;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
             font-weight: 600;
         }
 
         .abbonamento-info p {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin: 4px 0;
+            margin: 3px 0;
         }
 
         .abbonamento-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
             font-weight: 600;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .badge-attivo {
@@ -452,12 +454,12 @@
 
         /* File Info */
         .file-info {
-            padding: 14px 16px;
+            padding: 10px 12px;
             background: var(--primary-light);
             border-left: 3px solid var(--primary);
             border-radius: 6px;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
         }
 
         .file-info strong {
@@ -467,19 +469,20 @@
         /* Notifications */
         .notification {
             position: fixed;
-            top: 24px;
-            right: 24px;
-            padding: 16px 20px;
+            top: 16px;
+            right: 16px;
+            padding: 12px 16px;
             border-radius: 8px;
             color: white;
             font-weight: 500;
             box-shadow: var(--shadow-lg);
             z-index: 9999;
             animation: slideIn 0.3s ease;
-            max-width: 400px;
+            max-width: 380px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            font-size: 0.9rem;
         }
 
         @keyframes slideIn {
@@ -499,9 +502,10 @@
         .notification.info { background: var(--primary); }
 
         .notification svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             fill: white;
+            flex-shrink: 0;
         }
 
         /* Loading Spinner */
@@ -572,36 +576,54 @@
             }
 
             .header {
-                padding: 20px;
-            }
-
-            .card {
                 padding: 16px;
             }
 
+            .header-text h1 {
+                font-size: 1.25rem;
+            }
+
+            .header-text p {
+                font-size: 0.8rem;
+            }
+
+            .card {
+                padding: 12px;
+            }
+
+            .card-header h2 {
+                font-size: 1rem;
+            }
+
             .tessera {
-                transform: scale(0.8);
+                transform: scale(0.75);
             }
 
             .abbonamenti-grid {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 7px 12px;
+                font-size: 0.8rem;
             }
         }
 
         /* Utility Folder Info Alert */
         .alert {
-            padding: 14px 16px;
+            padding: 10px 12px;
             border-radius: 8px;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: flex-start;
-            gap: 12px;
-            font-size: 0.9rem;
+            gap: 10px;
+            font-size: 0.85rem;
         }
 
         .alert svg {
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             flex-shrink: 0;
             margin-top: 2px;
         }
@@ -829,7 +851,7 @@
                 </div>
 
                 <div id="abbonamenti-grid" class="abbonamenti-grid">
-                    <p style="text-align: center; color: var(--text-secondary); padding: 40px;">
+                    <p style="text-align: center; color: var(--text-secondary); padding: 32px; font-size: 0.9rem;">
                         Carica o crea un database per visualizzare gli abbonamenti
                     </p>
                 </div>
@@ -847,20 +869,20 @@
 
     <!-- Modal Libreria QR Code -->
     <div id="qr-library-modal" class="loading-spinner" style="background: rgba(0,0,0,0.5);">
-        <div class="spinner-content" style="background: white; border-radius: 12px; padding: 24px; max-width: 800px; width: 90%; max-height: 80vh; overflow: auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0; color: var(--text-primary);">Libreria QR Code Salvati</h2>
-                <button onclick="app.chiudiLibreriaQR()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: var(--text-secondary);">&times;</button>
+        <div class="spinner-content" style="background: white; border-radius: 12px; padding: 16px; max-width: 800px; width: 90%; max-height: 80vh; overflow: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h2 style="margin: 0; color: var(--text-primary); font-size: 1.125rem;">Libreria QR Code Salvati</h2>
+                <button onclick="app.chiudiLibreriaQR()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary); line-height: 1;">&times;</button>
             </div>
-            <div id="qr-library-content" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px;">
+            <div id="qr-library-content" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;">
                 <!-- QR codes verranno inseriti qui -->
             </div>
-            <div id="qr-library-empty" style="text-align: center; padding: 40px; color: var(--text-secondary); display: none;">
-                <svg viewBox="0 0 24 24" fill="currentColor" style="width: 64px; height: 64px; opacity: 0.3; margin-bottom: 16px;">
+            <div id="qr-library-empty" style="text-align: center; padding: 32px; color: var(--text-secondary); display: none;">
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width: 56px; height: 56px; opacity: 0.3; margin-bottom: 12px;">
                     <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
                 </svg>
-                <p>Nessun QR code salvato</p>
-                <p style="font-size: 14px;">Carica un QR code JPG per iniziare</p>
+                <p style="margin-bottom: 6px;">Nessun QR code salvato</p>
+                <p style="font-size: 13px;">Carica un QR code JPG per iniziare</p>
             </div>
         </div>
     </div>
@@ -1393,13 +1415,13 @@
                         emptyMessage.style.display = 'none';
 
                         content.innerHTML = qrCodes.map(qr => `
-                            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 12px; cursor: pointer; transition: all 0.2s;"
+                            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 10px; cursor: pointer; transition: all 0.2s;"
                                  onclick="app.selezionaQRDaLibreria(${qr.id}, '${qr.url.replace(/'/g, "\\'")}', '${qr.imageBase64.replace(/'/g, "\\'")}')">
-                                <img src="${qr.imageBase64}" style="width: 100%; height: 120px; object-fit: contain; border: 1px solid #eee; border-radius: 4px; margin-bottom: 8px;">
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 4px;">${new Date(qr.timestamp).toLocaleString('it-IT')}</div>
-                                <div style="font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${qr.url}">${qr.url}</div>
+                                <img src="${qr.imageBase64}" style="width: 100%; height: 100px; object-fit: contain; border: 1px solid #eee; border-radius: 4px; margin-bottom: 6px;">
+                                <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 3px;">${new Date(qr.timestamp).toLocaleString('it-IT')}</div>
+                                <div style="font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${qr.url}">${qr.url}</div>
                                 <button onclick="event.stopPropagation(); app.eliminaQRDaLibreria(${qr.id})"
-                                        style="margin-top: 8px; padding: 4px 8px; background: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; width: 100%;">
+                                        style="margin-top: 6px; padding: 4px 8px; background: var(--danger); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; width: 100%;">
                                     Elimina
                                 </button>
                             </div>
@@ -1837,7 +1859,7 @@
                 const grid = document.getElementById('abbonamenti-grid');
 
                 if (this.database.length === 0) {
-                    grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 40px;">Nessun abbonamento nel database</p>';
+                    grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 32px;">Nessun abbonamento nel database</p>';
                     return;
                 }
 
