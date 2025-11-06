@@ -28,26 +28,32 @@ STRUTTURA FILE RICHIESTI:
 CARICAMENTO AUTOMATICO:
 ======================
 
-All'apertura o ricaricamento dell'applicazione, il sistema
-cercherà automaticamente questi file nella cartella Utility:
+⚠️ IMPORTANTE: Il caricamento automatico funziona SOLO se apri il file
+da un server HTTP (es. http://localhost:8080).
+
+Se apri il file direttamente (doppio click), dovrai usare il pulsante
+"Ricarica Sfondi" o caricare manualmente i file.
+
+Quando usi un server HTTP, il sistema cercherà automaticamente:
 
 ✓ Utility/sfondo-fronte.png
 ✓ Utility/sfondo-retro.png
 
-Se i file sono presenti con i nomi ESATTI, verranno caricati
-automaticamente e vedrai una notifica verde.
+Se i file sono presenti con i nomi ESATTI, clicca il pulsante
+"Ricarica Sfondi" (icona circolare) e vedrai una notifica verde.
 
-Se mancano, potrai caricarli manualmente tramite i pulsanti:
+Se mancano o preferisci caricarli manualmente, usa i pulsanti:
 - "Sfondo Fronte (Opzionale)"
 - "Sfondo Retro (Opzionale)"
 
 NOTE IMPORTANTI:
 ===============
 
-- I nomi dei file devono essere ESATTI (minuscole)
+- I nomi dei file devono essere ESATTI (minuscole, con trattino)
 - La cartella Utility deve essere allo stesso livello del file HTML
 - Le immagini vengono salvate nel database come Base64
 - Backup regolare del database consigliato
+- Caricamento automatico richiede server HTTP (non file://)
 
 STRUTTURA DIRECTORY:
 ===================
@@ -55,6 +61,6 @@ STRUTTURA DIRECTORY:
 📁 TuaCartella/
 ├── gestione_tessere_abbonamento.html  ← File principale
 └── 📁 Utility/
-    ├── sfondo_fronte.jpg              ← Sfondo fronte tessera
-    ├── sfondo_retro.jpg               ← Sfondo retro tessera
+    ├── sfondo-fronte.png              ← Sfondo fronte tessera
+    ├── sfondo-retro.png               ← Sfondo retro tessera
     └── database_abbonamenti.xlsx      ← Database abbonamenti

@@ -850,8 +850,8 @@
                 document.getElementById('data-emissione-input').valueAsDate = oggi;
                 this.calcolaScadenza();
 
-                // Tentativo di caricamento automatico all'avvio
-                setTimeout(() => this.caricaAutomatico(), 500);
+                // Caricamento automatico rimosso per evitare errori CORS
+                // Usa il pulsante "Ricarica Sfondi" se hai un server HTTP attivo
             }
 
             // Mostra/Nascondi loading spinner
@@ -896,7 +896,15 @@
             }
 
             // Caricamento automatico da cartella Utility
+            // NOTA: Funziona solo se il file HTML è servito da un server HTTP (es. http://localhost:8080)
+            // Non funziona se apri il file direttamente (file://) a causa delle restrizioni CORS
             async caricaAutomatico() {
+                // Controlla se siamo in file:// protocol
+                if (window.location.protocol === 'file:') {
+                    this.mostraNotifica('Caricamento automatico non disponibile da file locale. Usa i pulsanti per caricare gli sfondi manualmente, oppure apri il file da un server HTTP.', 'warning');
+                    return;
+                }
+
                 this.mostraLoading(true, 'Ricerca sfondi nella cartella Utility...');
 
                 try {
@@ -1052,11 +1060,24 @@
                         this.mostraNotifica('Database vuoto, nessun dato da esportare', 'warning');
                         return;
                     }
-                    const worksheet = XLSX.utils.json_to_sheet(this.database);
+
+                    // Crea copia del database senza i campi Base64 (troppo grandi per Excel)
+                    const databaseExport = this.database.map(abbonamento => {
+                        const {Sfondo_Fronte_Base64, Sfondo_Retro_Base64, QR_Base64, ...resto} = abbonamento;
+                        return {
+                            ...resto,
+                            // Aggiungi flag per indicare presenza immagini
+                            Ha_Sfondo_Fronte: !!Sfondo_Fronte_Base64,
+                            Ha_Sfondo_Retro: !!Sfondo_Retro_Base64,
+                            Ha_QR_Code: !!QR_Base64
+                        };
+                    });
+
+                    const worksheet = XLSX.utils.json_to_sheet(databaseExport);
                     const workbook = XLSX.utils.book_new();
                     XLSX.utils.book_append_sheet(workbook, worksheet, 'Abbonamenti');
                     XLSX.writeFile(workbook, this.nomeDatabase);
-                    this.mostraNotifica('Database esportato con successo!', 'success');
+                    this.mostraNotifica('Database esportato con successo! (Le immagini Base64 non sono incluse)', 'success');
                 } catch (error) {
                     console.error('Errore esportazione database:', error);
                     this.mostraNotifica('Errore durante l\'esportazione', 'error');
@@ -1351,11 +1372,11 @@
 
                 const padding = 15 * mmToPx;
                 const qrSize = 26 * mmToPx;
-                const qrX = canvas.width - qrSize - padding;
+                const qrX = canvas.width - qrSize - (5 * mmToPx);  // 5mm dal bordo destro
                 const centerY = canvas.height / 2;
 
-                // Informazioni (a sinistra, testo 4mm)
-                ctx.font = `bold ${4 * mmToPx}px "Segoe UI", Arial`;
+                // Informazioni (a sinistra, testo 3mm)
+                ctx.font = `bold ${3 * mmToPx}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#202124';
                 ctx.textAlign = 'left';
 
