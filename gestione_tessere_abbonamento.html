@@ -301,7 +301,7 @@
             position: absolute;
             bottom: 15px;
             right: 20px;
-            font-size: 42px;
+            font-size: 20px;
             font-weight: bold;
             color: black;
             text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
@@ -721,6 +721,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="sfondo-fronte-input">Sfondo Fronte (Opzionale)</label>
+                    <input type="file" id="sfondo-fronte-input" accept="image/png,image/jpeg" onchange="app.caricaSfondoFronte(this.files[0])">
+                </div>
+
+                <div class="form-group">
+                    <label for="sfondo-retro-input">Sfondo Retro (Opzionale)</label>
+                    <input type="file" id="sfondo-retro-input" accept="image/png,image/jpeg" onchange="app.caricaSfondoRetro(this.files[0])">
+                </div>
+
+                <div class="form-group">
                     <label for="qr-input">QR Code (Opzionale)</label>
                     <input type="file" id="qr-input" accept="image/png,image/jpeg" onchange="app.caricaQR(this.files[0])">
                 </div>
@@ -890,14 +900,12 @@
                 this.mostraLoading(true, 'Ricerca file nella cartella Utility...');
 
                 try {
-                    // Prova a caricare gli sfondi di default
-                    await this.caricaSfondiDefault();
-
+                    // Non caricare sfondi di default - l'utente deve caricarli manualmente
                     // Nota: Il caricamento automatico del database e immagini da file system
                     // non è possibile per restrizioni di sicurezza del browser.
                     // L'utente deve selezionare manualmente i file.
 
-                    this.mostraNotifica('Per caricare database e sfondi, usa i pulsanti "Carica" o posiziona i file in Utility/', 'info');
+                    this.mostraNotifica('Carica gli sfondi usando i pulsanti "Sfondo Fronte" e "Sfondo Retro"', 'info');
                 } catch (error) {
                     console.log('Caricamento automatico non disponibile:', error);
                 } finally {
@@ -1018,6 +1026,32 @@
                 document.getElementById('db-filename').textContent = this.nomeDatabase;
                 document.getElementById('db-count').textContent = this.database.length;
                 document.getElementById('db-next-id').textContent = this.prossimoID.toString().padStart(3, '0');
+            }
+
+            // Carica sfondo fronte
+            async caricaSfondoFronte(file) {
+                if (!file) return;
+                try {
+                    this.sfondoFronteBase64 = await this.fileToBase64(file);
+                    this.aggiornaPreview();
+                    this.mostraNotifica('Sfondo fronte caricato', 'success');
+                } catch (error) {
+                    console.error('Errore caricamento sfondo fronte:', error);
+                    this.mostraNotifica('Errore durante il caricamento dello sfondo', 'error');
+                }
+            }
+
+            // Carica sfondo retro
+            async caricaSfondoRetro(file) {
+                if (!file) return;
+                try {
+                    this.sfondoRetroBase64 = await this.fileToBase64(file);
+                    this.aggiornaPreview();
+                    this.mostraNotifica('Sfondo retro caricato', 'success');
+                } catch (error) {
+                    console.error('Errore caricamento sfondo retro:', error);
+                    this.mostraNotifica('Errore durante il caricamento dello sfondo', 'error');
+                }
             }
 
             // Carica QR code
@@ -1234,7 +1268,7 @@
                 }
 
                 // Numero progressivo
-                ctx.font = `bold ${11 * mmToPx}px "Courier New", monospace`;
+                ctx.font = `bold ${5 * mmToPx}px "Courier New", monospace`;
                 ctx.fillStyle = 'black';
                 ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
                 ctx.shadowBlur = 2 * mmToPx / 25.4;
@@ -1276,18 +1310,18 @@
                 const centerY = canvas.height / 2;
 
                 // Informazioni (a sinistra)
-                ctx.font = `bold ${7 * mmToPx / 25.4}px "Segoe UI", Arial`;
+                ctx.font = `bold ${7 * mmToPx}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#202124';
                 ctx.textAlign = 'left';
 
-                const textStartY = centerY - (7 * mmToPx);
+                const textStartY = centerY - (10 * mmToPx);
 
                 ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, textStartY);
-                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (7 * mmToPx));
+                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (9 * mmToPx));
 
                 const dataScadenza = new Date(abbonamento.Data_Scadenza);
                 const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
-                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (14 * mmToPx));
+                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (18 * mmToPx));
 
                 // QR Code (a destra)
                 if (abbonamento.QR_Base64) {
@@ -1322,6 +1356,8 @@
             resetForm() {
                 document.getElementById('nome-input').value = '';
                 document.getElementById('cognome-input').value = '';
+                document.getElementById('sfondo-fronte-input').value = '';
+                document.getElementById('sfondo-retro-input').value = '';
                 document.getElementById('qr-input').value = '';
 
                 const oggi = new Date();
@@ -1329,6 +1365,7 @@
                 this.calcolaScadenza();
 
                 this.qrBase64 = null;
+                // Non resetto gli sfondi perché potrebbero essere riutilizzati per più tessere
                 document.getElementById('preview-container').classList.remove('active');
             }
 
