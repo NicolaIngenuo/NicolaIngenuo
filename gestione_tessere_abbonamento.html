@@ -832,6 +832,124 @@
 
     <!-- JavaScript -->
     <script>
+        // Classe per gestire IndexedDB per i QR code
+        class QRCodeDatabase {
+            constructor() {
+                this.dbName = 'QRCodeDB';
+                this.version = 1;
+                this.db = null;
+            }
+
+            // Inizializza database IndexedDB
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+
+                    request.onerror = () => {
+                        console.error('Errore apertura IndexedDB:', request.error);
+                        reject(request.error);
+                    };
+
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        console.log('IndexedDB inizializzato con successo');
+                        resolve(this.db);
+                    };
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+
+                        // Crea object store se non esiste
+                        if (!db.objectStoreNames.contains('qrcodes')) {
+                            const objectStore = db.createObjectStore('qrcodes', { keyPath: 'id', autoIncrement: true });
+                            objectStore.createIndex('url', 'url', { unique: false });
+                            objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+                            console.log('Object store "qrcodes" creato');
+                        }
+                    };
+                });
+            }
+
+            // Salva QR code in IndexedDB
+            async saveQRCode(url, imageBase64, imageName) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) {
+                        reject(new Error('Database non inizializzato'));
+                        return;
+                    }
+
+                    const transaction = this.db.transaction(['qrcodes'], 'readwrite');
+                    const objectStore = transaction.objectStore('qrcodes');
+
+                    const qrData = {
+                        url: url,
+                        imageBase64: imageBase64,
+                        imageName: imageName || 'qr_code.jpg',
+                        timestamp: new Date().toISOString()
+                    };
+
+                    const request = objectStore.add(qrData);
+
+                    request.onsuccess = () => {
+                        console.log('QR code salvato in IndexedDB con ID:', request.result);
+                        resolve(request.result);
+                    };
+
+                    request.onerror = () => {
+                        console.error('Errore salvataggio QR code:', request.error);
+                        reject(request.error);
+                    };
+                });
+            }
+
+            // Recupera tutti i QR code salvati
+            async getAllQRCodes() {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) {
+                        reject(new Error('Database non inizializzato'));
+                        return;
+                    }
+
+                    const transaction = this.db.transaction(['qrcodes'], 'readonly');
+                    const objectStore = transaction.objectStore('qrcodes');
+                    const request = objectStore.getAll();
+
+                    request.onsuccess = () => {
+                        resolve(request.result);
+                    };
+
+                    request.onerror = () => {
+                        console.error('Errore recupero QR codes:', request.error);
+                        reject(request.error);
+                    };
+                });
+            }
+
+            // Elimina QR code per ID
+            async deleteQRCode(id) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) {
+                        reject(new Error('Database non inizializzato'));
+                        return;
+                    }
+
+                    const transaction = this.db.transaction(['qrcodes'], 'readwrite');
+                    const objectStore = transaction.objectStore('qrcodes');
+                    const request = objectStore.delete(id);
+
+                    request.onsuccess = () => {
+                        console.log('QR code eliminato, ID:', id);
+                        resolve();
+                    };
+
+                    request.onerror = () => {
+                        console.error('Errore eliminazione QR code:', request.error);
+                        reject(request.error);
+                    };
+                });
+            }
+        }
+
         // Classe principale per la gestione dell'applicazione
         class AbbonamentoManager {
             constructor() {
@@ -843,12 +961,22 @@
                 this.qrCodeData = null;  // Contenuto decodificato del QR (URL o testo)
                 this.qrPreviewImage = null;  // Immagine del QR per l'anteprima
                 this.abbonamentiSelezionati = new Set();
+                this.qrDB = new QRCodeDatabase();  // Database IndexedDB per QR codes
                 this.init();
             }
 
             // Inizializzazione dell'applicazione
-            init() {
+            async init() {
                 console.log('Inizializzazione Gestione Tessere Abbonamento...');
+
+                // Inizializza IndexedDB per QR codes
+                try {
+                    await this.qrDB.init();
+                } catch (error) {
+                    console.error('Errore inizializzazione IndexedDB:', error);
+                    this.mostraNotifica('Attenzione: Database QR code non disponibile', 'warning');
+                }
+
                 const oggi = new Date();
                 document.getElementById('data-emissione-input').valueAsDate = oggi;
                 this.calcolaScadenza();
@@ -1128,11 +1256,11 @@
                 try {
                     this.mostraLoading(true, 'Decodifica QR code...');
 
-                    // Carica l'immagine
+                    // 1. Carica l'immagine JPEG
                     const base64 = await this.fileToBase64(file);
                     const img = await this.caricaImmagine(base64);
 
-                    // Crea canvas per decodifica
+                    // 2. Crea canvas per decodifica
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
                     canvas.height = img.height;
@@ -1146,10 +1274,25 @@
                     const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
 
                     if (qrCode && qrCode.data) {
-                        this.qrCodeData = qrCode.data;  // Salva il contenuto decodificato
+                        // 2. Estrai l'indirizzo/URL contenuto
+                        const urlEstratto = qrCode.data;
+
+                        this.qrCodeData = urlEstratto;  // Salva temporaneamente per l'abbonamento corrente
                         this.qrPreviewImage = base64;   // Salva immagine per anteprima
+
+                        // 3. Salva l'indirizzo estratto in IndexedDB
+                        try {
+                            const qrId = await this.qrDB.saveQRCode(urlEstratto, base64, file.name);
+                            console.log('QR code salvato in IndexedDB, ID:', qrId);
+
+                            // 4. Mostra messaggio di conferma
+                            this.mostraNotifica(`✓ QR Code salvato! URL: ${urlEstratto.substring(0, 60)}${urlEstratto.length > 60 ? '...' : ''}`, 'success');
+                        } catch (dbError) {
+                            console.error('Errore salvataggio in IndexedDB:', dbError);
+                            this.mostraNotifica(`QR decodificato ma non salvato: ${urlEstratto.substring(0, 50)}...`, 'warning');
+                        }
+
                         this.aggiornaPreview();
-                        this.mostraNotifica(`QR Code decodificato: ${qrCode.data.substring(0, 50)}${qrCode.data.length > 50 ? '...' : ''}`, 'success');
                     } else {
                         throw new Error('Impossibile decodificare il QR code');
                     }
