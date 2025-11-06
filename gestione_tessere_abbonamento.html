@@ -1264,28 +1264,28 @@
                 try {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF({
-                        orientation: 'portrait',
+                        orientation: 'landscape',
                         unit: 'mm',
                         format: 'a4'
                     });
 
-                    // Dimensioni A4 e quadranti
-                    const a4Width = 210;
-                    const a4Height = 297;
-                    const quadrantWidth = a4Width / 2;      // 105mm
-                    const quadrantHeight = a4Height / 2;    // 148.5mm
+                    // Dimensioni A4 LANDSCAPE e quadranti
+                    const a4Width = 297;   // Larghezza in landscape
+                    const a4Height = 210;  // Altezza in landscape
+                    const quadrantWidth = a4Width / 2;      // 148.5mm
+                    const quadrantHeight = a4Height / 2;    // 105mm
 
                     const cardWidth = 85.6;
                     const cardHeight = 53.98;
 
                     // Calcola offset per centrare carta in quadrante
-                    const offsetX = (quadrantWidth - cardWidth) / 2;
-                    const offsetY = (quadrantHeight - cardHeight) / 2;
+                    const offsetX = (quadrantWidth - cardWidth) / 2;    // 31.45mm
+                    const offsetY = (quadrantHeight - cardHeight) / 2;  // 25.51mm
 
                     // PAGINA FRONTE - Carta in Q1 (Alto Sinistra)
                     pdf.setFontSize(10);
                     pdf.setTextColor(100, 100, 100);
-                    pdf.text('FRONTE - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+                    pdf.text('FRONTE - Stampa fronte/retro su lato corto', 148.5, 5, { align: 'center' });
 
                     const fronteCanvas = await this.creaTesseraFronte(abbonamento);
                     const fronteImg = fronteCanvas.toDataURL('image/png');
@@ -1299,19 +1299,19 @@
                     // Linee guida quadranti
                     pdf.setDrawColor(220, 220, 220);
                     pdf.setLineWidth(0.1);
-                    pdf.line(quadrantWidth, 0, quadrantWidth, a4Height);
-                    pdf.line(0, quadrantHeight, a4Width, quadrantHeight);
+                    pdf.line(quadrantWidth, 0, quadrantWidth, a4Height);  // Verticale centrale
+                    pdf.line(0, quadrantHeight, a4Width, quadrantHeight); // Orizzontale centrale
 
                     // PAGINA RETRO - Carta in Q2 (Alto Destra)
                     pdf.addPage();
                     pdf.setFontSize(10);
                     pdf.setTextColor(100, 100, 100);
-                    pdf.text('RETRO - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+                    pdf.text('RETRO - Stampa fronte/retro su lato corto', 148.5, 5, { align: 'center' });
 
                     const retroCanvas = await this.creaTesseraRetro(abbonamento);
                     const retroImg = retroCanvas.toDataURL('image/png');
 
-                    // Posizione Q2: x=105, y=0
+                    // Posizione Q2: x=148.5, y=0
                     const retroX = quadrantWidth + offsetX;
                     const retroY = 0 + offsetY;
                     pdf.addImage(retroImg, 'PNG', retroX, retroY, cardWidth, cardHeight);
@@ -1594,7 +1594,7 @@
                 try {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF({
-                        orientation: 'portrait',
+                        orientation: 'landscape',
                         unit: 'mm',
                         format: 'a4'
                     });
@@ -1602,18 +1602,18 @@
                     // Limitiamo a massimo 4 abbonamenti
                     const abbonamentiDaStampare = abbonamenti.slice(0, 4);
 
-                    // Dimensioni A4 e quadranti
-                    const a4Width = 210;  // mm
-                    const a4Height = 297; // mm
-                    const quadrantWidth = a4Width / 2;      // 105mm
-                    const quadrantHeight = a4Height / 2;    // 148.5mm
+                    // Dimensioni A4 LANDSCAPE e quadranti
+                    const a4Width = 297;   // Larghezza in landscape
+                    const a4Height = 210;  // Altezza in landscape
+                    const quadrantWidth = a4Width / 2;      // 148.5mm
+                    const quadrantHeight = a4Height / 2;    // 105mm
 
                     const cardWidth = 85.6;
                     const cardHeight = 53.98;
 
                     // Calcola offset per centrare carta in quadrante
-                    const offsetX = (quadrantWidth - cardWidth) / 2;    // 9.7mm
-                    const offsetY = (quadrantHeight - cardHeight) / 2;  // 47.26mm
+                    const offsetX = (quadrantWidth - cardWidth) / 2;    // 31.45mm
+                    const offsetY = (quadrantHeight - cardHeight) / 2;  // 25.51mm
 
                     // Definisci posizioni quadranti (coordinate angolo superiore sinistro)
                     const quadrants = {
@@ -1680,7 +1680,7 @@
                     // PAGINA FRONTE
                     pdf.setFontSize(10);
                     pdf.setTextColor(100, 100, 100);
-                    pdf.text('FRONTE - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+                    pdf.text('FRONTE - Stampa fronte/retro su lato corto', 148.5, 5, { align: 'center' });
 
                     for (const mapping of frontMapping) {
                         const abbonamento = abbonamentiDaStampare[mapping.abb];
@@ -1699,7 +1699,7 @@
                     pdf.addPage();
                     pdf.setFontSize(10);
                     pdf.setTextColor(100, 100, 100);
-                    pdf.text('RETRO - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+                    pdf.text('RETRO - Stampa fronte/retro su lato corto', 148.5, 5, { align: 'center' });
 
                     for (const mapping of backMapping) {
                         const abbonamento = abbonamentiDaStampare[mapping.abb];
