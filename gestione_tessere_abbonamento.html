@@ -299,8 +299,8 @@
 
         .tessera-numero {
             position: absolute;
-            bottom: 15px;
-            right: 20px;
+            top: 4mm;
+            right: 4mm;
             font-size: 20px;
             font-weight: bold;
             color: black;
@@ -897,20 +897,64 @@
 
             // Caricamento automatico da cartella Utility
             async caricaAutomatico() {
-                this.mostraLoading(true, 'Ricerca file nella cartella Utility...');
+                this.mostraLoading(true, 'Ricerca sfondi nella cartella Utility...');
 
                 try {
-                    // Non caricare sfondi di default - l'utente deve caricarli manualmente
-                    // Nota: Il caricamento automatico del database e immagini da file system
-                    // non è possibile per restrizioni di sicurezza del browser.
-                    // L'utente deve selezionare manualmente i file.
+                    let fronteCaricato = false;
+                    let retroCaricato = false;
 
-                    this.mostraNotifica('Carica gli sfondi usando i pulsanti "Sfondo Fronte" e "Sfondo Retro"', 'info');
+                    // Prova a caricare sfondo-fronte.png
+                    try {
+                        const responseFronte = await fetch('Utility/sfondo-fronte.png');
+                        if (responseFronte.ok) {
+                            const blob = await responseFronte.blob();
+                            this.sfondoFronteBase64 = await this.blobToBase64(blob);
+                            fronteCaricato = true;
+                            console.log('Sfondo fronte caricato da Utility/');
+                        }
+                    } catch (e) {
+                        console.log('Sfondo fronte non trovato in Utility/');
+                    }
+
+                    // Prova a caricare sfondo-retro.png
+                    try {
+                        const responseRetro = await fetch('Utility/sfondo-retro.png');
+                        if (responseRetro.ok) {
+                            const blob = await responseRetro.blob();
+                            this.sfondoRetroBase64 = await this.blobToBase64(blob);
+                            retroCaricato = true;
+                            console.log('Sfondo retro caricato da Utility/');
+                        }
+                    } catch (e) {
+                        console.log('Sfondo retro non trovato in Utility/');
+                    }
+
+                    // Aggiorna preview se almeno uno sfondo è stato caricato
+                    if (fronteCaricato || retroCaricato) {
+                        this.aggiornaPreview();
+                        const messaggi = [];
+                        if (fronteCaricato) messaggi.push('sfondo fronte');
+                        if (retroCaricato) messaggi.push('sfondo retro');
+                        this.mostraNotifica(`Caricati automaticamente: ${messaggi.join(' e ')}`, 'success');
+                    } else {
+                        this.mostraNotifica('Nessuno sfondo trovato in Utility/. Usa i pulsanti per caricarli manualmente.', 'info');
+                    }
                 } catch (error) {
-                    console.log('Caricamento automatico non disponibile:', error);
+                    console.log('Errore caricamento automatico:', error);
+                    this.mostraNotifica('Carica gli sfondi usando i pulsanti "Sfondo Fronte" e "Sfondo Retro"', 'info');
                 } finally {
                     this.mostraLoading(false);
                 }
+            }
+
+            // Converti Blob in Base64
+            blobToBase64(blob) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
             }
 
             // Carica sfondi di default (placeholder)
@@ -1267,7 +1311,7 @@
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
 
-                // Numero progressivo
+                // Numero progressivo (in alto a destra, 4mm dai bordi)
                 ctx.font = `bold ${5 * mmToPx}px "Courier New", monospace`;
                 ctx.fillStyle = 'black';
                 ctx.shadowColor = 'rgba(255, 255, 255, 0.6)';
@@ -1275,10 +1319,11 @@
                 ctx.shadowOffsetX = 1 * mmToPx / 25.4;
                 ctx.shadowOffsetY = 1 * mmToPx / 25.4;
                 ctx.textAlign = 'right';
+                ctx.textBaseline = 'top';
                 ctx.fillText(
                     abbonamento.ID_Progressivo.toString().padStart(3, '0'),
-                    canvas.width - (10 * mmToPx),
-                    canvas.height - (10 * mmToPx)
+                    canvas.width - (4 * mmToPx),
+                    4 * mmToPx
                 );
 
                 return canvas;
@@ -1309,19 +1354,19 @@
                 const qrX = canvas.width - qrSize - padding;
                 const centerY = canvas.height / 2;
 
-                // Informazioni (a sinistra)
-                ctx.font = `bold ${7 * mmToPx}px "Segoe UI", Arial`;
+                // Informazioni (a sinistra, testo 4mm)
+                ctx.font = `bold ${4 * mmToPx}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#202124';
                 ctx.textAlign = 'left';
 
-                const textStartY = centerY - (10 * mmToPx);
+                const textStartY = centerY - (6 * mmToPx);
 
                 ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, textStartY);
-                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (9 * mmToPx));
+                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (6 * mmToPx));
 
                 const dataScadenza = new Date(abbonamento.Data_Scadenza);
                 const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
-                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (18 * mmToPx));
+                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (12 * mmToPx));
 
                 // QR Code (a destra)
                 if (abbonamento.QR_Base64) {

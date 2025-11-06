@@ -8,15 +8,17 @@ dell'applicazione di gestione tessere abbonamento.
 STRUTTURA FILE RICHIESTI:
 ========================
 
-1. sfondo_fronte.jpg (o .png)
+1. sfondo-fronte.png
    - Immagine di sfondo per il FRONTE della tessera
    - Dimensioni consigliate: 1000x630px o superiori
-   - Formato: JPEG o PNG
+   - Formato: PNG (nome ESATTO: sfondo-fronte.png)
+   - ⚠️ IMPORTANTE: Il nome deve essere esatto (con trattino)
 
-2. sfondo_retro.jpg (o .png)
+2. sfondo-retro.png
    - Immagine di sfondo per il RETRO della tessera
    - Dimensioni consigliate: 1000x630px o superiori
-   - Formato: JPEG o PNG
+   - Formato: PNG (nome ESATTO: sfondo-retro.png)
+   - ⚠️ IMPORTANTE: Il nome deve essere esatto (con trattino)
 
 3. database_abbonamenti.xlsx
    - Database Excel con tutti gli abbonamenti
@@ -26,15 +28,18 @@ STRUTTURA FILE RICHIESTI:
 CARICAMENTO AUTOMATICO:
 ======================
 
-All'apertura dell'applicazione, il sistema cercherà
-automaticamente questi file nella cartella Utility:
+All'apertura o ricaricamento dell'applicazione, il sistema
+cercherà automaticamente questi file nella cartella Utility:
 
-✓ Utility/sfondo_fronte.jpg (o .png)
-✓ Utility/sfondo_retro.jpg (o .png)
-✓ Utility/database_abbonamenti.xlsx
+✓ Utility/sfondo-fronte.png
+✓ Utility/sfondo-retro.png
 
-Se i file sono presenti, verranno caricati automaticamente.
-Se mancano, potrai caricarli manualmente tramite l'interfaccia.
+Se i file sono presenti con i nomi ESATTI, verranno caricati
+automaticamente e vedrai una notifica verde.
+
+Se mancano, potrai caricarli manualmente tramite i pulsanti:
+- "Sfondo Fronte (Opzionale)"
+- "Sfondo Retro (Opzionale)"
 
 NOTE IMPORTANTI:
 ===============
