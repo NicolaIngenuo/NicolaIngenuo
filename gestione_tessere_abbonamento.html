@@ -1259,33 +1259,69 @@
                 }
             }
 
-            // Genera PDF singolo
+            // Genera PDF singolo con sistema a quadranti
             async generaPDFSingolo(abbonamento) {
                 try {
                     const { jsPDF } = window.jspdf;
                     const pdf = new jsPDF({
-                        orientation: 'landscape',
+                        orientation: 'portrait',
                         unit: 'mm',
                         format: 'a4'
                     });
 
-                    const fronteCanvas = await this.creaTesseraFronte(abbonamento);
-                    const fronteImg = fronteCanvas.toDataURL('image/png');
+                    // Dimensioni A4 e quadranti
+                    const a4Width = 210;
+                    const a4Height = 297;
+                    const quadrantWidth = a4Width / 2;      // 105mm
+                    const quadrantHeight = a4Height / 2;    // 148.5mm
 
                     const cardWidth = 85.6;
                     const cardHeight = 53.98;
-                    const marginX = (297 - cardWidth) / 2;
-                    const marginY = (210 - cardHeight) / 2;
 
-                    pdf.addImage(fronteImg, 'PNG', marginX, marginY, cardWidth, cardHeight);
-                    this.aggiungiLineeTaglio(pdf, marginX, marginY, cardWidth, cardHeight);
+                    // Calcola offset per centrare carta in quadrante
+                    const offsetX = (quadrantWidth - cardWidth) / 2;
+                    const offsetY = (quadrantHeight - cardHeight) / 2;
+
+                    // PAGINA FRONTE - Carta in Q1 (Alto Sinistra)
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('FRONTE - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+
+                    const fronteCanvas = await this.creaTesseraFronte(abbonamento);
+                    const fronteImg = fronteCanvas.toDataURL('image/png');
+
+                    // Posizione Q1: x=0, y=0
+                    const fronteX = 0 + offsetX;
+                    const fronteY = 0 + offsetY;
+                    pdf.addImage(fronteImg, 'PNG', fronteX, fronteY, cardWidth, cardHeight);
+                    this.aggiungiLineeTaglio(pdf, fronteX, fronteY, cardWidth, cardHeight);
+
+                    // Linee guida quadranti
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.1);
+                    pdf.line(quadrantWidth, 0, quadrantWidth, a4Height);
+                    pdf.line(0, quadrantHeight, a4Width, quadrantHeight);
+
+                    // PAGINA RETRO - Carta in Q2 (Alto Destra)
+                    pdf.addPage();
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('RETRO - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
 
                     const retroCanvas = await this.creaTesseraRetro(abbonamento);
                     const retroImg = retroCanvas.toDataURL('image/png');
 
-                    pdf.addPage();
-                    pdf.addImage(retroImg, 'PNG', marginX, marginY, cardWidth, cardHeight);
-                    this.aggiungiLineeTaglio(pdf, marginX, marginY, cardWidth, cardHeight);
+                    // Posizione Q2: x=105, y=0
+                    const retroX = quadrantWidth + offsetX;
+                    const retroY = 0 + offsetY;
+                    pdf.addImage(retroImg, 'PNG', retroX, retroY, cardWidth, cardHeight);
+                    this.aggiungiLineeTaglio(pdf, retroX, retroY, cardWidth, cardHeight);
+
+                    // Linee guida quadranti
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.1);
+                    pdf.line(quadrantWidth, 0, quadrantWidth, a4Height);
+                    pdf.line(0, quadrantHeight, a4Width, quadrantHeight);
 
                     const filename = `Abbonamento_${abbonamento.ID_Progressivo.toString().padStart(3, '0')}_${abbonamento.Nome}_${abbonamento.Cognome}.pdf`;
                     pdf.save(filename);
@@ -1370,24 +1406,24 @@
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
 
-                const padding = 15 * mmToPx;
+                const leftMargin = 5 * mmToPx;  // 5mm dal margine sinistro
                 const qrSize = 26 * mmToPx;
                 const qrX = canvas.width - qrSize - (5 * mmToPx);  // 5mm dal bordo destro
                 const centerY = canvas.height / 2;
 
-                // Informazioni (a sinistra, testo 3mm)
+                // Informazioni (allineate a 5mm da sinistra, testo 3mm)
                 ctx.font = `bold ${3 * mmToPx}px "Segoe UI", Arial`;
                 ctx.fillStyle = '#202124';
                 ctx.textAlign = 'left';
 
                 const textStartY = centerY - (6 * mmToPx);
 
-                ctx.fillText(`Nome: ${abbonamento.Nome}`, padding, textStartY);
-                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, padding, textStartY + (6 * mmToPx));
+                ctx.fillText(`Nome: ${abbonamento.Nome}`, leftMargin, textStartY);
+                ctx.fillText(`Cognome: ${abbonamento.Cognome}`, leftMargin, textStartY + (6 * mmToPx));
 
                 const dataScadenza = new Date(abbonamento.Data_Scadenza);
                 const dataFormattata = dataScadenza.toLocaleDateString('it-IT');
-                ctx.fillText(`Valido fino al: ${dataFormattata}`, padding, textStartY + (12 * mmToPx));
+                ctx.fillText(`Valido fino al: ${dataFormattata}`, leftMargin, textStartY + (12 * mmToPx));
 
                 // QR Code (a destra)
                 if (abbonamento.QR_Base64) {
@@ -1553,7 +1589,7 @@
                 }
             }
 
-            // Genera PDF multiplo
+            // Genera PDF multiplo con sistema a quadranti per stampa fronte/retro
             async generaPDFMultiplo(abbonamenti) {
                 try {
                     const { jsPDF } = window.jspdf;
@@ -1563,52 +1599,123 @@
                         format: 'a4'
                     });
 
+                    // Limitiamo a massimo 4 abbonamenti
+                    const abbonamentiDaStampare = abbonamenti.slice(0, 4);
+
+                    // Dimensioni A4 e quadranti
+                    const a4Width = 210;  // mm
+                    const a4Height = 297; // mm
+                    const quadrantWidth = a4Width / 2;      // 105mm
+                    const quadrantHeight = a4Height / 2;    // 148.5mm
+
                     const cardWidth = 85.6;
                     const cardHeight = 53.98;
-                    const spacing = 10;
-                    const startX = (210 - (cardWidth * 2 + spacing)) / 2;
-                    const startY = 20;
 
-                    for (let i = 0; i < abbonamenti.length; i += 2) {
-                        if (i > 0) pdf.addPage();
+                    // Calcola offset per centrare carta in quadrante
+                    const offsetX = (quadrantWidth - cardWidth) / 2;    // 9.7mm
+                    const offsetY = (quadrantHeight - cardHeight) / 2;  // 47.26mm
 
-                        const batch = abbonamenti.slice(i, i + 2);
+                    // Definisci posizioni quadranti (coordinate angolo superiore sinistro)
+                    const quadrants = {
+                        Q1: { x: 0, y: 0 },                      // Alto Sinistra
+                        Q2: { x: quadrantWidth, y: 0 },          // Alto Destra
+                        Q3: { x: 0, y: quadrantHeight },         // Basso Sinistra
+                        Q4: { x: quadrantWidth, y: quadrantHeight } // Basso Destra
+                    };
 
-                        pdf.setFontSize(14);
-                        pdf.setTextColor(26, 115, 232);
-                        pdf.text('Tessere Abbonamento - Fronte', 105, 10, { align: 'center' });
+                    // Funzione helper per posizionare carta in un quadrante
+                    const placeCardInQuadrant = (quadrant, cardImg, cardW, cardH) => {
+                        const quad = quadrants[quadrant];
+                        const x = quad.x + offsetX;
+                        const y = quad.y + offsetY;
+                        pdf.addImage(cardImg, 'PNG', x, y, cardW, cardH);
+                        this.aggiungiLineeTaglio(pdf, x, y, cardW, cardH);
+                    };
 
-                        for (let j = 0; j < batch.length; j++) {
-                            const abb = batch[j];
-                            const fronteCanvas = await this.creaTesseraFronte(abb);
-                            const fronteImg = fronteCanvas.toDataURL('image/png');
+                    // LOGICA DI POSIZIONAMENTO in base al numero di abbonamenti
+                    // Considera il capovolgimento su lato corto
+                    const numAbb = abbonamentiDaStampare.length;
 
-                            const x = startX;
-                            const y = startY + (j * (cardHeight + spacing));
+                    // Definisci mappature fronte/retro
+                    let frontMapping, backMapping;
 
-                            pdf.addImage(fronteImg, 'PNG', x, y, cardWidth, cardHeight);
-                            this.aggiungiLineeTaglio(pdf, x, y, cardWidth, cardHeight);
-                        }
-
-                        pdf.addPage();
-                        pdf.setFontSize(14);
-                        pdf.text('Tessere Abbonamento - Retro', 105, 10, { align: 'center' });
-
-                        for (let j = 0; j < batch.length; j++) {
-                            const abb = batch[j];
-                            const retroCanvas = await this.creaTesseraRetro(abb);
-                            const retroImg = retroCanvas.toDataURL('image/png');
-
-                            const x = startX;
-                            const y = startY + (j * (cardHeight + spacing));
-
-                            pdf.addImage(retroImg, 'PNG', x, y, cardWidth, cardHeight);
-                            this.aggiungiLineeTaglio(pdf, x, y, cardWidth, cardHeight);
-                        }
+                    if (numAbb === 1) {
+                        frontMapping = [{ abb: 0, quad: 'Q1' }];
+                        backMapping = [{ abb: 0, quad: 'Q2' }];
+                    } else if (numAbb === 2) {
+                        frontMapping = [
+                            { abb: 0, quad: 'Q1' },
+                            { abb: 1, quad: 'Q2' }
+                        ];
+                        backMapping = [
+                            { abb: 1, quad: 'Q1' },
+                            { abb: 0, quad: 'Q2' }
+                        ];
+                    } else if (numAbb === 3) {
+                        frontMapping = [
+                            { abb: 0, quad: 'Q1' },
+                            { abb: 1, quad: 'Q2' },
+                            { abb: 2, quad: 'Q3' }
+                        ];
+                        backMapping = [
+                            { abb: 1, quad: 'Q1' },
+                            { abb: 0, quad: 'Q2' },
+                            { abb: 2, quad: 'Q4' }
+                        ];
+                    } else if (numAbb === 4) {
+                        frontMapping = [
+                            { abb: 0, quad: 'Q1' },
+                            { abb: 1, quad: 'Q2' },
+                            { abb: 2, quad: 'Q3' },
+                            { abb: 3, quad: 'Q4' }
+                        ];
+                        backMapping = [
+                            { abb: 1, quad: 'Q1' },
+                            { abb: 0, quad: 'Q2' },
+                            { abb: 3, quad: 'Q3' },
+                            { abb: 2, quad: 'Q4' }
+                        ];
                     }
 
+                    // PAGINA FRONTE
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('FRONTE - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+
+                    for (const mapping of frontMapping) {
+                        const abbonamento = abbonamentiDaStampare[mapping.abb];
+                        const fronteCanvas = await this.creaTesseraFronte(abbonamento);
+                        const fronteImg = fronteCanvas.toDataURL('image/png');
+                        placeCardInQuadrant(mapping.quad, fronteImg, cardWidth, cardHeight);
+                    }
+
+                    // Aggiungi linee guida quadranti (opzionali, commentabili)
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.1);
+                    pdf.line(quadrantWidth, 0, quadrantWidth, a4Height);  // Linea verticale centrale
+                    pdf.line(0, quadrantHeight, a4Width, quadrantHeight); // Linea orizzontale centrale
+
+                    // PAGINA RETRO
+                    pdf.addPage();
+                    pdf.setFontSize(10);
+                    pdf.setTextColor(100, 100, 100);
+                    pdf.text('RETRO - Stampa fronte/retro su lato corto', 105, 5, { align: 'center' });
+
+                    for (const mapping of backMapping) {
+                        const abbonamento = abbonamentiDaStampare[mapping.abb];
+                        const retroCanvas = await this.creaTesseraRetro(abbonamento);
+                        const retroImg = retroCanvas.toDataURL('image/png');
+                        placeCardInQuadrant(mapping.quad, retroImg, cardWidth, cardHeight);
+                    }
+
+                    // Aggiungi linee guida quadranti
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.1);
+                    pdf.line(quadrantWidth, 0, quadrantWidth, a4Height);
+                    pdf.line(0, quadrantHeight, a4Width, quadrantHeight);
+
                     const timestamp = new Date().toISOString().split('T')[0];
-                    const filename = `Abbonamenti_Multipli_${timestamp}.pdf`;
+                    const filename = `Abbonamenti_Quadranti_${timestamp}.pdf`;
                     pdf.save(filename);
                 } catch (error) {
                     console.error('Errore generazione PDF multiplo:', error);
