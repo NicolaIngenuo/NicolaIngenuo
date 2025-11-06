@@ -1327,8 +1327,8 @@
                     this.mostraLoading(true, 'Decodifica QR code...');
 
                     // 1. Carica l'immagine JPEG
-                    const base64 = await this.fileToBase64(file);
-                    const img = await this.caricaImmagine(base64);
+                    const base64JPG = await this.fileToBase64(file);
+                    const img = await this.caricaImmagine(base64JPG);
 
                     // 2. Crea canvas per decodifica
                     const canvas = document.createElement('canvas');
@@ -1344,19 +1344,22 @@
                     const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
 
                     if (qrCode && qrCode.data) {
-                        // 2. Estrai l'indirizzo/URL contenuto
+                        // 3. Estrai l'indirizzo/URL contenuto
                         const urlEstratto = qrCode.data;
 
-                        this.qrCodeData = urlEstratto;  // Salva temporaneamente per l'abbonamento corrente
-                        this.qrPreviewImage = base64;   // Salva immagine per anteprima
+                        this.qrCodeData = urlEstratto;  // Salva URL per l'abbonamento corrente
 
-                        // 3. Salva l'indirizzo estratto in IndexedDB
+                        // 4. RIGENERA un QR code pulito dall'URL estratto (sostituisce il JPG)
+                        const qrGenerato = await this.generaQRCode(urlEstratto, 256);
+                        this.qrPreviewImage = qrGenerato;  // Usa il QR generato, NON il JPG originale
+
+                        // 5. Salva il QR code GENERATO in IndexedDB (non il JPG originale)
                         try {
-                            const qrId = await this.qrDB.saveQRCode(urlEstratto, base64, file.name);
-                            console.log('QR code salvato in IndexedDB, ID:', qrId);
+                            const qrId = await this.qrDB.saveQRCode(urlEstratto, qrGenerato, file.name);
+                            console.log('QR code rigenerato e salvato in IndexedDB, ID:', qrId);
 
-                            // 4. Mostra messaggio di conferma
-                            this.mostraNotifica(`✓ QR Code salvato! URL: ${urlEstratto.substring(0, 60)}${urlEstratto.length > 60 ? '...' : ''}`, 'success');
+                            // 6. Mostra messaggio di conferma
+                            this.mostraNotifica(`✓ QR Code decodificato e rigenerato! URL: ${urlEstratto.substring(0, 50)}${urlEstratto.length > 50 ? '...' : ''}`, 'success');
                         } catch (dbError) {
                             console.error('Errore salvataggio in IndexedDB:', dbError);
                             this.mostraNotifica(`QR decodificato ma non salvato: ${urlEstratto.substring(0, 50)}...`, 'warning');
@@ -1367,7 +1370,7 @@
 
                         this.aggiornaPreview();
                     } else {
-                        throw new Error('Impossibile decodificare il QR code');
+                        throw new Error('Impossibile decodificare il QR code dall\'immagine');
                     }
                 } catch (error) {
                     console.error('Errore caricamento QR:', error);
