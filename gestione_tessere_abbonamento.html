@@ -195,6 +195,45 @@
             margin-bottom: 0;
         }
 
+        /* Tooltip */
+        .info-tooltip {
+            position: relative;
+            display: inline-flex;
+            cursor: pointer;
+            align-items: center;
+        }
+
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 1000;
+            transition: opacity 0.2s ease-in-out;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+
+        .info-tooltip .tooltip-text code {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
         /* Buttons */
         .btn {
             padding: 8px 16px;
@@ -669,19 +708,18 @@
                     </svg>
                 </div>
                 <div class="header-text">
-                    <h1>Gestione Tessere Abbonamento</h1>
-                    <p>Sistema professionale per creazione e stampa tessere formato carta di credito</p>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h1>Gestione Tessere Abbonamento</h1>
+                        <div class="info-tooltip">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; color: var(--primary);">
+                                <path d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"/>
+                            </svg>
+                            <span class="tooltip-text">
+                                <strong>Cartella Utility:</strong> Posiziona i file <code>sfondo_fronte.jpg</code>, <code>sfondo_retro.jpg</code> e <code>database_abbonamenti.xlsx</code> nella cartella <code>Utility/</code> per il caricamento automatico.
+                            </span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Alert Cartella Utility -->
-        <div class="alert alert-info">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"/>
-            </svg>
-            <div>
-                <strong>Cartella Utility:</strong> Posiziona i file <code>sfondo_fronte.jpg</code>, <code>sfondo_retro.jpg</code> e <code>database_abbonamenti.xlsx</code> nella cartella <code>Utility/</code> per il caricamento automatico.
             </div>
         </div>
 
@@ -690,17 +728,18 @@
 
             <!-- Database Section -->
             <div class="card full-width">
-                <div class="card-header">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 3C7.58 3 4 4.79 4 7s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4M4 9v3c0 2.21 3.58 4 8 4s8-1.79 8-4V9c0 2.21-3.58 4-8 4s-8-1.79-8-4m0 5v3c0 2.21 3.58 4 8 4s8-1.79 8-4v-3c0 2.21-3.58 4-8 4s-8-1.79-8-4z"/>
-                    </svg>
-                    <h2>Database</h2>
-                </div>
-
-                <div id="database-info" class="file-info" style="display: none;">
-                    <strong>Database:</strong> <span id="db-filename"></span> |
-                    <strong>Abbonamenti:</strong> <span id="db-count">0</span> |
-                    <strong>Prossimo ID:</strong> <span id="db-next-id">1</span>
+                <div class="card-header" style="justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 3C7.58 3 4 4.79 4 7s3.58 4 8 4 8-1.79 8-4-3.58-4-8-4M4 9v3c0 2.21 3.58 4 8 4s8-1.79 8-4V9c0 2.21-3.58 4-8 4s-8-1.79-8-4m0 5v3c0 2.21 3.58 4 8 4s8-1.79 8-4v-3c0 2.21-3.58 4-8 4s-8-1.79-8-4z"/>
+                        </svg>
+                        <h2>Database</h2>
+                    </div>
+                    <div id="database-info" class="file-info" style="display: none; font-size: 0.85rem; color: var(--text-secondary);">
+                        <strong>Database:</strong> <span id="db-filename"></span> |
+                        <strong>Abbonamenti:</strong> <span id="db-count">0</span> |
+                        <strong>Prossimo ID:</strong> <span id="db-next-id">1</span>
+                    </div>
                 </div>
 
                 <div class="btn-group">
