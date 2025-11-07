@@ -1026,6 +1026,9 @@
             async init() {
                 console.log('Inizializzazione Gestione Tessere Abbonamento...');
 
+                // Verifica librerie CDN
+                await this.verificaLibrerie();
+
                 // Inizializza IndexedDB per QR codes
                 try {
                     await this.qrDB.init();
@@ -1040,6 +1043,37 @@
 
                 // Caricamento automatico rimosso per evitare errori CORS
                 // Usa il pulsante "Ricarica Sfondi" se hai un server HTTP attivo
+            }
+
+            // Verifica che le librerie CDN siano caricate
+            async verificaLibrerie() {
+                const maxRetries = 10;
+                const retryDelay = 500; // millisecondi
+
+                for (let i = 0; i < maxRetries; i++) {
+                    const jsQRLoaded = typeof jsQR !== 'undefined';
+                    const qrcodeLoaded = typeof qrcode !== 'undefined';
+                    const jsPDFLoaded = typeof window.jspdf !== 'undefined';
+                    const XLSXLoaded = typeof XLSX !== 'undefined';
+
+                    if (jsQRLoaded && qrcodeLoaded && jsPDFLoaded && XLSXLoaded) {
+                        console.log('✓ Tutte le librerie CDN caricate correttamente');
+                        return;
+                    }
+
+                    const missing = [];
+                    if (!jsQRLoaded) missing.push('jsQR');
+                    if (!qrcodeLoaded) missing.push('qrcode-generator');
+                    if (!jsPDFLoaded) missing.push('jsPDF');
+                    if (!XLSXLoaded) missing.push('XLSX');
+
+                    console.log(`Attesa caricamento librerie: ${missing.join(', ')}... (tentativo ${i + 1}/${maxRetries})`);
+                    await new Promise(resolve => setTimeout(resolve, retryDelay));
+                }
+
+                // Se dopo 10 tentativi non sono caricate, avvisa l'utente
+                console.warn('⚠️ Alcune librerie potrebbero non essere state caricate correttamente');
+                this.mostraNotifica('Attenzione: alcune funzionalità potrebbero non essere disponibili. Verifica la connessione internet.', 'warning');
             }
 
             // Mostra/Nascondi loading spinner
@@ -1323,6 +1357,14 @@
             // Carica e decodifica QR code
             async caricaQR(file) {
                 if (!file) return;
+
+                // Verifica che jsQR sia disponibile
+                if (typeof jsQR === 'undefined') {
+                    this.mostraNotifica('Libreria jsQR non ancora caricata. Riprova tra pochi secondi...', 'warning');
+                    console.error('jsQR non è ancora disponibile. Attendi il caricamento completo della pagina.');
+                    return;
+                }
+
                 try {
                     this.mostraLoading(true, 'Decodifica QR code...');
 
@@ -1389,6 +1431,13 @@
                     return;
                 }
 
+                // Verifica che qrcode sia disponibile
+                if (typeof qrcode === 'undefined') {
+                    console.error('qrcode-generator non è ancora disponibile');
+                    this.mostraNotifica('Libreria QR non ancora caricata. Riprova tra pochi secondi...', 'warning');
+                    return;
+                }
+
                 try {
                     // Salva l'URL
                     this.qrCodeData = url.trim();
@@ -1399,6 +1448,7 @@
                     this.aggiornaPreview();
                 } catch (error) {
                     console.error('Errore generazione QR da URL:', error);
+                    this.mostraNotifica('Errore durante la generazione del QR code', 'error');
                 }
             }
 
