@@ -21,19 +21,20 @@
         }
 
         :root {
-            /* Treasurana Color Palette */
-            --primary: #1D594E;
-            --primary-dark: #154439;
-            --primary-light: #e8f3f1;
-            --success: #1D594E;
+            /* Yellow & Gray Color Palette */
+            --primary: #424242;
+            --primary-dark: #212121;
+            --primary-light: #f5f5f5;
+            --success: #616161;
             --warning: #F2CB05;
             --warning-dark: #F29F05;
             --accent: #F28705;
             --danger: #F23030;
-            --text-primary: #202124;
-            --text-secondary: #5f6368;
-            --border: #dadce0;
-            --bg-gray: #f8f9fa;
+            --text-primary: #212121;
+            --text-secondary: #616161;
+            --border: #e0e0e0;
+            --bg-gray: #fafafa;
+            --bg-yellow: rgba(255, 217, 0, 1);
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
             --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
             --shadow-lg: 0 10px 20px rgba(0,0,0,0.15);
@@ -41,7 +42,7 @@
 
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
-            background: #f0f2f5;
+            background: var(--bg-yellow);
             min-height: 100vh;
             color: var(--text-primary);
             line-height: 1.6;
@@ -245,7 +246,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(29, 89, 78, 0.92);
+            background: rgba(255, 217, 0, 0.8);
+            backdrop-filter: blur(4px);
             z-index: 10000;
             justify-content: center;
             align-items: center;
@@ -301,11 +303,11 @@
         }
 
         .modal-icon.info {
-            background: var(--primary-light);
+            background: #e8e8e8;
         }
 
         .modal-icon.info svg {
-            fill: var(--primary);
+            fill: #424242;
         }
 
         .modal-content h2 {
