@@ -815,9 +815,21 @@
         }
 
         .alert-warning {
-            background: #fef7e0;
-            color: #9c6c00;
-            border-left: 3px solid var(--warning);
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 3px solid var(--accent);
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 3px solid #4caf50;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border-left: 3px solid var(--danger);
         }
     </style>
 </head>
@@ -1130,6 +1142,81 @@
         </div>
     </div>
 
+    <!-- Modal Carica Assets Database -->
+    <div id="modal-carica-assets" class="modal-overlay">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-icon info">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1M3,5H1V21A2,2 0 0,0 3,23H19V21H3M15.96,10.29L13.21,13.83L11.25,11.47L8.5,15H19.5L15.96,10.29Z"/>
+                </svg>
+            </div>
+            <h2>📁 Carica Assets per Database</h2>
+            <p style="margin-bottom: 24px;">Associa sfondi e logo a questo database.<br>La prossima volta che lo carichi, verranno applicati automaticamente!</p>
+
+            <div style="display: grid; gap: 16px; text-align: left;">
+                <!-- Sfondo Fronte -->
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: var(--text-primary);">🖼️ Sfondo Fronte</strong>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="document.getElementById('asset-fronte-input').click()">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Seleziona
+                        </button>
+                    </div>
+                    <div id="asset-fronte-preview" style="color: var(--text-secondary); font-size: 0.85rem;">Nessun file selezionato</div>
+                    <input type="file" id="asset-fronte-input" accept="image/*" style="display: none;" onchange="app.assetFileSelected('fronte', this.files[0])">
+                </div>
+
+                <!-- Sfondo Retro -->
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: var(--text-primary);">🖼️ Sfondo Retro</strong>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="document.getElementById('asset-retro-input').click()">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Seleziona
+                        </button>
+                    </div>
+                    <div id="asset-retro-preview" style="color: var(--text-secondary); font-size: 0.85rem;">Nessun file selezionato</div>
+                    <input type="file" id="asset-retro-input" accept="image/*" style="display: none;" onchange="app.assetFileSelected('retro', this.files[0])">
+                </div>
+
+                <!-- Logo -->
+                <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong style="color: var(--text-primary);">🎨 Logo (SVG/PNG)</strong>
+                        <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="document.getElementById('asset-logo-input').click()">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                            Seleziona
+                        </button>
+                    </div>
+                    <div id="asset-logo-preview" style="color: var(--text-secondary); font-size: 0.85rem;">Nessun file selezionato</div>
+                    <input type="file" id="asset-logo-input" accept="image/svg+xml,image/png" style="display: none;" onchange="app.assetFileSelected('logo', this.files[0])">
+                </div>
+            </div>
+
+            <div class="modal-buttons" style="margin-top: 24px;">
+                <button class="btn btn-success" onclick="app.salvaAssetsDatabase()">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4m-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3m3-10H5V5h10v4z"/>
+                    </svg>
+                    Salva e Associa
+                </button>
+                <button class="btn btn-secondary" onclick="app.chiudiModalCaricaAssets()">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    Salta
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // Classe per gestire IndexedDB per i QR code
@@ -1250,6 +1337,124 @@
             }
         }
 
+        // Classe per gestire IndexedDB per assets dei database
+        class DatabaseAssetsStorage {
+            constructor() {
+                this.dbName = 'DatabaseAssetsDB';
+                this.version = 1;
+                this.db = null;
+            }
+
+            // Inizializza database IndexedDB
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(this.dbName, this.version);
+
+                    request.onerror = () => {
+                        console.error('Errore apertura DatabaseAssetsDB:', request.error);
+                        reject(request.error);
+                    };
+
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        console.log('DatabaseAssetsDB inizializzato con successo');
+                        resolve(this.db);
+                    };
+
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+
+                        // Crea object store se non esiste
+                        if (!db.objectStoreNames.contains('assets')) {
+                            const objectStore = db.createObjectStore('assets', { keyPath: 'databaseName' });
+                            objectStore.createIndex('timestamp', 'timestamp', { unique: false });
+                            console.log('Object store "assets" creato');
+                        }
+                    };
+                });
+            }
+
+            // Salva assets associati a un database
+            async saveAssets(databaseName, sfondoFronte, sfondoRetro, logo) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) {
+                        reject(new Error('Database non inizializzato'));
+                        return;
+                    }
+
+                    const transaction = this.db.transaction(['assets'], 'readwrite');
+                    const objectStore = transaction.objectStore('assets');
+
+                    const assetData = {
+                        databaseName: databaseName,
+                        sfondoFronte: sfondoFronte || null,
+                        sfondoRetro: sfondoRetro || null,
+                        logo: logo || null,
+                        timestamp: Date.now()
+                    };
+
+                    const request = objectStore.put(assetData);
+
+                    request.onsuccess = () => {
+                        console.log('Assets salvati per database:', databaseName);
+                        resolve();
+                    };
+
+                    request.onerror = () => {
+                        console.error('Errore salvataggio assets:', request.error);
+                        reject(request.error);
+                    };
+                });
+            }
+
+            // Carica assets associati a un database
+            async loadAssets(databaseName) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) {
+                        reject(new Error('Database non inizializzato'));
+                        return;
+                    }
+
+                    const transaction = this.db.transaction(['assets'], 'readonly');
+                    const objectStore = transaction.objectStore('assets');
+                    const request = objectStore.get(databaseName);
+
+                    request.onsuccess = () => {
+                        resolve(request.result || null);
+                    };
+
+                    request.onerror = () => {
+                        console.error('Errore caricamento assets:', request.error);
+                        reject(request.error);
+                    };
+                });
+            }
+
+            // Elimina assets associati a un database
+            async deleteAssets(databaseName) {
+                return new Promise((resolve, reject) => {
+                    if (!this.db) {
+                        reject(new Error('Database non inizializzato'));
+                        return;
+                    }
+
+                    const transaction = this.db.transaction(['assets'], 'readwrite');
+                    const objectStore = transaction.objectStore('assets');
+                    const request = objectStore.delete(databaseName);
+
+                    request.onsuccess = () => {
+                        console.log('Assets eliminati per database:', databaseName);
+                        resolve();
+                    };
+
+                    request.onerror = () => {
+                        console.error('Errore eliminazione assets:', request.error);
+                        reject(request.error);
+                    };
+                });
+            }
+        }
+
         // Classe principale per la gestione dell'applicazione
         class AbbonamentoManager {
             constructor() {
@@ -1262,6 +1467,13 @@
                 this.qrPreviewImage = null;  // Immagine del QR per l'anteprima
                 this.abbonamentiSelezionati = new Set();
                 this.qrDB = new QRCodeDatabase();  // Database IndexedDB per QR codes
+                this.assetsDB = new DatabaseAssetsStorage();  // Database IndexedDB per assets dei database
+                // Assets temporanei per il modal
+                this.tempAssets = {
+                    fronte: null,
+                    retro: null,
+                    logo: null
+                };
                 this.init();
             }
 
@@ -1276,8 +1488,16 @@
                 try {
                     await this.qrDB.init();
                 } catch (error) {
-                    console.error('Errore inizializzazione IndexedDB:', error);
+                    console.error('Errore inizializzazione IndexedDB QR:', error);
                     this.mostraNotifica('Attenzione: Database QR code non disponibile', 'warning');
+                }
+
+                // Inizializza IndexedDB per assets dei database
+                try {
+                    await this.assetsDB.init();
+                } catch (error) {
+                    console.error('Errore inizializzazione IndexedDB Assets:', error);
+                    this.mostraNotifica('Attenzione: Database assets non disponibile', 'warning');
                 }
 
                 const oggi = new Date();
@@ -1501,6 +1721,37 @@
                         const conQR = data.filter(a => a.QR_Code_Data && a.QR_Code_Data.trim() !== '').length;
                         this.mostraNotifica(`Database caricato: ${data.length} abbonamenti${conQR > 0 ? ` (${conQR} con QR code)` : ''}`, 'success');
                         document.getElementById('btn-export').disabled = false;
+
+                        // Controlla se esistono assets associati a questo database
+                        this.mostraLoading(true, 'Verifica assets associati...');
+                        try {
+                            const assets = await this.assetsDB.loadAssets(file.name);
+
+                            if (assets) {
+                                // Assets trovati! Caricali automaticamente
+                                if (assets.sfondoFronte) {
+                                    this.sfondoFronteBase64 = assets.sfondoFronte;
+                                }
+                                if (assets.sfondoRetro) {
+                                    this.sfondoRetroBase64 = assets.sfondoRetro;
+                                }
+                                // TODO: Gestire logo quando implementato
+
+                                this.aggiornaPreview();
+                                this.mostraNotifica('✅ Assets caricati automaticamente!', 'success');
+                            } else {
+                                // Nessun asset salvato, proponi di caricarli
+                                setTimeout(() => {
+                                    this.mostraModalCaricaAssets();
+                                }, 500);
+                            }
+                        } catch (error) {
+                            console.error('Errore caricamento assets:', error);
+                            // Non bloccare l'app, mostra solo il modal per caricarli
+                            setTimeout(() => {
+                                this.mostraModalCaricaAssets();
+                            }, 500);
+                        }
                     } else {
                         throw new Error('Database vuoto o formato non valido');
                     }
@@ -1820,6 +2071,73 @@
             // Chiudi modal carica iniziale
             chiudiModalCaricaIniziale() {
                 document.getElementById('modal-carica-iniziale').classList.remove('active');
+            }
+
+            // Mostra modal carica assets
+            mostraModalCaricaAssets() {
+                // Reset tempAssets
+                this.tempAssets = {
+                    fronte: null,
+                    retro: null,
+                    logo: null
+                };
+                // Reset preview
+                document.getElementById('asset-fronte-preview').textContent = 'Nessun file selezionato';
+                document.getElementById('asset-retro-preview').textContent = 'Nessun file selezionato';
+                document.getElementById('asset-logo-preview').textContent = 'Nessun file selezionato';
+
+                document.getElementById('modal-carica-assets').classList.add('active');
+            }
+
+            // Chiudi modal carica assets
+            chiudiModalCaricaAssets() {
+                document.getElementById('modal-carica-assets').classList.remove('active');
+            }
+
+            // Gestisce la selezione di un file asset nel modal
+            async assetFileSelected(tipo, file) {
+                if (!file) return;
+
+                try {
+                    const base64 = await this.fileToBase64(file);
+                    this.tempAssets[tipo] = base64;
+
+                    // Aggiorna preview
+                    const previewId = `asset-${tipo}-preview`;
+                    document.getElementById(previewId).innerHTML = `✅ ${file.name} <span style="color: var(--success);">(caricato)</span>`;
+                } catch (error) {
+                    console.error(`Errore caricamento ${tipo}:`, error);
+                    this.mostraNotifica(`Errore caricamento file ${tipo}`, 'error');
+                }
+            }
+
+            // Salva gli assets associati al database corrente
+            async salvaAssetsDatabase() {
+                try {
+                    // Salva in IndexedDB associati al nome database
+                    await this.assetsDB.saveAssets(
+                        this.nomeDatabase,
+                        this.tempAssets.fronte,
+                        this.tempAssets.retro,
+                        this.tempAssets.logo
+                    );
+
+                    // Applica immediatamente gli assets
+                    if (this.tempAssets.fronte) {
+                        this.sfondoFronteBase64 = this.tempAssets.fronte;
+                    }
+                    if (this.tempAssets.retro) {
+                        this.sfondoRetroBase64 = this.tempAssets.retro;
+                    }
+                    // TODO: Gestire il logo quando implementato
+
+                    this.aggiornaPreview();
+                    this.chiudiModalCaricaAssets();
+                    this.mostraNotifica('✅ Assets salvati e associati al database!', 'success');
+                } catch (error) {
+                    console.error('Errore salvataggio assets:', error);
+                    this.mostraNotifica('Errore salvataggio assets', 'error');
+                }
             }
 
             // Seleziona QR dalla libreria
