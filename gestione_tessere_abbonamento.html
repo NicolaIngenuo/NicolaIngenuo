@@ -234,6 +234,93 @@
             opacity: 1;
         }
 
+        /* Modal Salva Database */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 48px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: #fef3cd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-icon svg {
+            width: 48px;
+            height: 48px;
+            fill: #ff9800;
+        }
+
+        .modal-content h2 {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-size: 1.75rem;
+        }
+
+        .modal-content p {
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .modal-buttons .btn {
+            padding: 14px 32px;
+            font-size: 1rem;
+        }
+
         /* Buttons */
         .btn {
             padding: 8px 16px;
@@ -949,6 +1036,34 @@
         </div>
     </div>
 
+    <!-- Modal Salva Database -->
+    <div id="modal-salva-database" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+                </svg>
+            </div>
+            <h2>⚠️ IMPORTANTE: Salva il Database!</h2>
+            <p>L'abbonamento è stato creato con successo.<br>
+            <strong>Ricordati di esportare il database</strong> per salvare le modifiche, altrimenti il nuovo abbonamento verrà perso!</p>
+            <div class="modal-buttons">
+                <button class="btn btn-success" onclick="app.esportaDatabaseDaModal()">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4m-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3m3-10H5V5h10v4z"/>
+                    </svg>
+                    Esporta Database Ora
+                </button>
+                <button class="btn btn-secondary" onclick="app.chiudiModalSalvaDatabase()">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                    </svg>
+                    Più Tardi
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- JavaScript -->
     <script>
         // Classe per gestire IndexedDB per i QR code
@@ -1608,6 +1723,22 @@
                 document.getElementById('qr-library-modal').style.display = 'none';
             }
 
+            // Mostra modal salva database
+            mostraModalSalvaDatabase() {
+                document.getElementById('modal-salva-database').classList.add('active');
+            }
+
+            // Chiudi modal salva database
+            chiudiModalSalvaDatabase() {
+                document.getElementById('modal-salva-database').classList.remove('active');
+            }
+
+            // Esporta database dal modal
+            async esportaDatabaseDaModal() {
+                await this.esportaDatabase();
+                this.chiudiModalSalvaDatabase();
+            }
+
             // Seleziona QR dalla libreria
             async selezionaQRDaLibreria(id, url, imageBase64) {
                 this.qrCodeData = url;
@@ -1753,6 +1884,9 @@
                     this.resetForm();
 
                     this.mostraNotifica(`Abbonamento N°${abbonamento.ID_Progressivo.toString().padStart(3, '0')} generato!`, 'success');
+
+                    // Mostra modal per ricordare di salvare il database
+                    this.mostraModalSalvaDatabase();
                 } catch (error) {
                     console.error('Errore generazione abbonamento:', error);
                     this.mostraNotifica('Errore durante la generazione', 'error');
