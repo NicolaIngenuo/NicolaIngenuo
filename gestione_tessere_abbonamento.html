@@ -56,12 +56,11 @@
 
         /* Header */
         .header {
-            background: white;
+            background: #212121;
             padding: 20px;
             margin-bottom: 16px;
             border-radius: 12px;
-            box-shadow: var(--shadow-sm);
-            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow-md);
         }
 
         .header-content {
@@ -73,7 +72,7 @@
         .header-icon {
             width: 40px;
             height: 40px;
-            background: var(--primary-light);
+            background: rgba(255, 217, 0, 0.2);
             border-radius: 10px;
             display: flex;
             align-items: center;
@@ -83,18 +82,18 @@
         .header-icon svg {
             width: 24px;
             height: 24px;
-            fill: var(--primary);
+            fill: var(--bg-yellow);
         }
 
         .header-text h1 {
             font-size: 1.5rem;
             font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 2px;
+            color: var(--bg-yellow);
+            margin: 0;
         }
 
         .header-text p {
-            color: var(--text-secondary);
+            color: rgba(255, 217, 0, 0.7);
             font-size: 0.875rem;
         }
 
@@ -849,17 +848,7 @@
                     </svg>
                 </div>
                 <div class="header-text">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <h1 id="header-titolo">Gestione Tessere Abbonamento</h1>
-                        <div class="info-tooltip">
-                            <svg viewBox="0 0 24 24" fill="currentColor" style="width: 20px; height: 20px; color: var(--primary);">
-                                <path d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"/>
-                            </svg>
-                            <span class="tooltip-text">
-                                <strong>Cartella Utility:</strong> Posiziona i file <code>sfondo_fronte.jpg</code>, <code>sfondo_retro.jpg</code> e <code>database_abbonamenti.xlsx</code> nella cartella <code>Utility/</code> per il caricamento automatico.
-                            </span>
-                        </div>
-                    </div>
+                    <h1 id="header-titolo">Gestione Tessere Abbonamento</h1>
                 </div>
             </div>
         </div>
@@ -948,7 +937,7 @@
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1M3,5H1V21A2,2 0 0,0 3,23H19V21H3M15.96,10.29L13.21,13.83L11.25,11.47L8.5,15H19.5L15.96,10.29Z"/>
                         </svg>
-                        🎨 Modifica Sfondi e Logo
+                        Modifica Sfondi e Logo
                     </button>
                 </div>
 
@@ -1067,7 +1056,7 @@
                     <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
                 </svg>
             </div>
-            <h2>⚠️ IMPORTANTE: Salva il Database!</h2>
+            <h2>IMPORTANTE: Salva il Database!</h2>
             <p>L'abbonamento è stato creato con successo.<br>
             <strong>Ricordati di esportare il database</strong> per salvare le modifiche, altrimenti il nuovo abbonamento verrà perso!</p>
             <div class="modal-buttons">
@@ -1129,14 +1118,14 @@
                     <path d="M21,17H7V3H21M21,1H7A2,2 0 0,0 5,3V17A2,2 0 0,0 7,19H21A2,2 0 0,0 23,17V3A2,2 0 0,0 21,1M3,5H1V21A2,2 0 0,0 3,23H19V21H3M15.96,10.29L13.21,13.83L11.25,11.47L8.5,15H19.5L15.96,10.29Z"/>
                 </svg>
             </div>
-            <h2>📁 Carica Assets per Database</h2>
-            <p style="margin-bottom: 24px;">Associa sfondi e logo a questo database.<br>La prossima volta che lo carichi, verranno applicati automaticamente!</p>
+            <h2>Modifica Grafica</h2>
+            <p style="margin-bottom: 20px; font-size: 0.9rem;">Associa sfondi e logo. Verranno applicati automaticamente al prossimo caricamento.</p>
 
             <div style="display: grid; gap: 16px; text-align: left;">
                 <!-- Sfondo Fronte -->
                 <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--text-primary);">🖼️ Sfondo Fronte</strong>
+                        <strong style="color: var(--text-primary);">Sfondo Fronte</strong>
                         <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="document.getElementById('asset-fronte-input').click()">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -1151,7 +1140,7 @@
                 <!-- Sfondo Retro -->
                 <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--text-primary);">🖼️ Sfondo Retro</strong>
+                        <strong style="color: var(--text-primary);">Sfondo Retro</strong>
                         <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="document.getElementById('asset-retro-input').click()">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -1166,7 +1155,7 @@
                 <!-- Logo -->
                 <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <strong style="color: var(--text-primary);">🎨 Logo (SVG/PNG)</strong>
+                        <strong style="color: var(--text-primary);">Logo (SVG/PNG)</strong>
                         <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.75rem;" onclick="document.getElementById('asset-logo-input').click()">
                             <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -1181,7 +1170,7 @@
                 <!-- Titolo Personalizzato -->
                 <div style="background: white; padding: 16px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="margin-bottom: 8px;">
-                        <strong style="color: var(--text-primary);">✏️ Titolo Personalizzato</strong>
+                        <strong style="color: var(--text-primary);">Titolo Personalizzato</strong>
                     </div>
                     <input type="text" id="asset-titolo-input" placeholder="es. Gestione Tessere Abbonamento"
                            style="width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem;">
@@ -1537,7 +1526,7 @@
                 }
 
                 // Se dopo 10 tentativi non sono caricate, avvisa l'utente
-                console.warn('⚠️ Alcune librerie potrebbero non essere state caricate correttamente');
+                console.warn('Alcune librerie potrebbero non essere state caricate correttamente');
                 this.mostraNotifica('Attenzione: alcune funzionalità potrebbero non essere disponibili. Verifica la connessione internet.', 'warning');
             }
 
@@ -1739,7 +1728,7 @@
 
                                 this.aggiornaHeader();
                                 this.aggiornaPreview();
-                                this.mostraNotifica('✅ Assets caricati automaticamente!', 'success');
+                                this.mostraNotifica('Assets caricati automaticamente!', 'success');
                             } else {
                                 // Nessun asset salvato, proponi di caricarli
                                 setTimeout(() => {
@@ -2068,7 +2057,7 @@
 
                     // Aggiorna preview
                     const previewId = `asset-${tipo}-preview`;
-                    document.getElementById(previewId).innerHTML = `✅ ${file.name} <span style="color: var(--success);">(caricato)</span>`;
+                    document.getElementById(previewId).innerHTML = `${file.name} <span style="color: var(--success);">(caricato)</span>`;
                 } catch (error) {
                     console.error(`Errore caricamento ${tipo}:`, error);
                     this.mostraNotifica(`Errore caricamento file ${tipo}`, 'error');
@@ -2106,7 +2095,7 @@
 
                     this.aggiornaPreview();
                     this.chiudiModalCaricaAssets();
-                    this.mostraNotifica('✅ Assets salvati e associati al database!', 'success');
+                    this.mostraNotifica('Assets salvati e associati al database!', 'success');
                 } catch (error) {
                     console.error('Errore salvataggio assets:', error);
                     this.mostraNotifica('Errore salvataggio assets', 'error');
@@ -2232,7 +2221,7 @@
 
                 // Validazione QR code obbligatorio
                 if (!this.qrCodeData || !this.qrPreviewImage) {
-                    this.mostraNotifica('⚠️ QR Code obbligatorio! Carica un QR code prima di generare l\'abbonamento.', 'error');
+                    this.mostraNotifica('QR Code obbligatorio! Carica un QR code prima di generare l\'abbonamento.', 'error');
                     return;
                 }
 
