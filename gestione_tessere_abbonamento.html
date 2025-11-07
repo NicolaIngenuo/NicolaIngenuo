@@ -178,6 +178,23 @@
             padding: 8px 12px;
         }
 
+        .form-group input[readonly] {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+        }
+
+        /* Form Row - per input affiancati */
+        .form-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
         /* Buttons */
         .btn {
             padding: 8px 16px;
@@ -724,24 +741,30 @@
                     <h2>Nuovo Abbonamento</h2>
                 </div>
 
-                <div class="form-group">
-                    <label for="nome-input">Nome *</label>
-                    <input type="text" id="nome-input" placeholder="Mario" oninput="app.aggiornaPreview()">
+                <!-- Nome e Cognome sulla stessa riga -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome-input">Nome *</label>
+                        <input type="text" id="nome-input" placeholder="Mario" oninput="app.aggiornaPreview()">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cognome-input">Cognome *</label>
+                        <input type="text" id="cognome-input" placeholder="Rossi" oninput="app.aggiornaPreview()">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="cognome-input">Cognome *</label>
-                    <input type="text" id="cognome-input" placeholder="Rossi" oninput="app.aggiornaPreview()">
-                </div>
+                <!-- Date sulla stessa riga -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="data-emissione-input">Data Emissione</label>
+                        <input type="date" id="data-emissione-input" onchange="app.calcolaScadenza()">
+                    </div>
 
-                <div class="form-group">
-                    <label for="data-emissione-input">Data Emissione</label>
-                    <input type="date" id="data-emissione-input" onchange="app.calcolaScadenza()">
-                </div>
-
-                <div class="form-group">
-                    <label for="data-scadenza-input">Data Scadenza</label>
-                    <input type="date" id="data-scadenza-input" readonly>
+                    <div class="form-group">
+                        <label for="data-scadenza-input">Data Scadenza (Auto)</label>
+                        <input type="date" id="data-scadenza-input" readonly>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -823,7 +846,7 @@
             </div>
 
             <!-- Ristampa Abbonamenti -->
-            <div class="card full-width">
+            <div class="card">
                 <div class="card-header">
                     <svg viewBox="0 0 24 24">
                         <path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3m-3 11H8v-5h8v5m3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1m-1-9H6v4h12V3z"/>
