@@ -245,7 +245,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(29, 89, 78, 0.92);
             z-index: 10000;
             justify-content: center;
             align-items: center;
@@ -325,11 +325,17 @@
             display: flex;
             gap: 16px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .modal-buttons .btn {
             padding: 14px 32px;
             font-size: 1rem;
+        }
+
+        .modal-buttons .btn svg {
+            width: 20px;
+            height: 20px;
         }
 
         /* Buttons */
@@ -358,6 +364,10 @@
             color: white;
         }
 
+        .btn-primary svg {
+            fill: white;
+        }
+
         .btn-primary:hover {
             background: var(--primary-dark);
             box-shadow: var(--shadow-md);
@@ -366,6 +376,10 @@
         .btn-success {
             background: var(--success);
             color: white;
+        }
+
+        .btn-success svg {
+            fill: white;
         }
 
         .btn-success:hover {
