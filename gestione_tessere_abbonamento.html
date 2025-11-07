@@ -1372,22 +1372,54 @@
                     const base64JPG = await this.fileToBase64(file);
                     const img = await this.caricaImmagine(base64JPG);
 
-                    // 2. Crea canvas per decodifica
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
+                    console.log(`Immagine caricata: ${img.width}x${img.height}px`);
 
-                    // Ottieni i dati dell'immagine
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    // 2. Prova a decodificare con diverse dimensioni per migliorare il riconoscimento
+                    const dimensioni = [
+                        { width: img.width, height: img.height, label: 'originale' },
+                        { width: 800, height: Math.round(img.height * 800 / img.width), label: '800px' },
+                        { width: 1200, height: Math.round(img.height * 1200 / img.width), label: '1200px' },
+                        { width: 400, height: Math.round(img.height * 400 / img.width), label: '400px' }
+                    ];
 
-                    // Decodifica con jsQR
-                    const qrCode = jsQR(imageData.data, imageData.width, imageData.height);
+                    let qrCode = null;
+                    let dimensioneSuccesso = null;
+
+                    for (const dim of dimensioni) {
+                        console.log(`Tentativo decodifica con dimensione ${dim.label}: ${dim.width}x${dim.height}px`);
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = dim.width;
+                        canvas.height = dim.height;
+                        const ctx = canvas.getContext('2d');
+
+                        // Disegna l'immagine ridimensionata
+                        ctx.drawImage(img, 0, 0, dim.width, dim.height);
+
+                        // Aumenta il contrasto per migliorare la decodifica
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        this.aumentaContrasto(imageData);
+                        ctx.putImageData(imageData, 0, 0);
+
+                        // Ottieni i dati dell'immagine dopo il contrasto
+                        const imageDataFinale = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+                        // Prova a decodificare
+                        qrCode = jsQR(imageDataFinale.data, canvas.width, canvas.height, {
+                            inversionAttempts: "dontInvert", // Prova anche con inversione
+                        });
+
+                        if (qrCode && qrCode.data) {
+                            dimensioneSuccesso = dim.label;
+                            console.log(`✓ QR Code decodificato con successo (dimensione ${dim.label})`);
+                            break;
+                        }
+                    }
 
                     if (qrCode && qrCode.data) {
                         // 3. Estrai l'indirizzo/URL contenuto
                         const urlEstratto = qrCode.data;
+                        console.log(`URL estratto: ${urlEstratto}`);
 
                         this.qrCodeData = urlEstratto;  // Salva URL per l'abbonamento corrente
 
@@ -1412,13 +1444,34 @@
 
                         this.aggiornaPreview();
                     } else {
-                        throw new Error('Impossibile decodificare il QR code dall\'immagine');
+                        throw new Error('Impossibile decodificare il QR code dall\'immagine. Assicurati che:\n- Il QR code sia ben visibile e a fuoco\n- L\'immagine abbia una buona qualità\n- Il QR code occupi una parte significativa dell\'immagine');
                     }
                 } catch (error) {
                     console.error('Errore caricamento QR:', error);
                     this.mostraNotifica('Errore: ' + error.message, 'error');
                 } finally {
                     this.mostraLoading(false);
+                }
+            }
+
+            // Aumenta il contrasto dell'immagine per migliorare la decodifica
+            aumentaContrasto(imageData) {
+                const data = imageData.data;
+                const factor = 1.5; // Fattore di contrasto
+
+                for (let i = 0; i < data.length; i += 4) {
+                    // Converti a scala di grigi
+                    const gray = (data[i] + data[i + 1] + data[i + 2]) / 3;
+
+                    // Applica contrasto
+                    let newGray = ((gray / 255 - 0.5) * factor + 0.5) * 255;
+                    newGray = Math.max(0, Math.min(255, newGray));
+
+                    // Applica a tutti i canali
+                    data[i] = newGray;     // R
+                    data[i + 1] = newGray; // G
+                    data[i + 2] = newGray; // B
+                    // Alpha rimane invariato (data[i + 3])
                 }
             }
 
