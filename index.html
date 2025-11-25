@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Exam Generator - Test Concorsuali</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🎓 AI Exam Generator</h1>
+            <p>Generatore di test concorsuali tramite AI multiple</p>
+        </header>
+
+        <!-- Configurazione -->
+        <div class="config-panel">
+            <h2>⚙️ Configurazione</h2>
+
+            <!-- Selezione Provider AI -->
+            <div class="form-group">
+                <label for="ai-provider">Provider AI:</label>
+                <select id="ai-provider">
+                    <option value="openai">OpenAI (GPT-4, GPT-3.5)</option>
+                    <option value="anthropic">Anthropic (Claude)</option>
+                    <option value="groq">Groq (Llama, Mixtral)</option>
+                    <option value="mistral">Mistral AI</option>
+                    <option value="custom">Custom Endpoint</option>
+                </select>
+            </div>
+
+            <!-- Modello (dinamico in base al provider) -->
+            <div class="form-group">
+                <label for="ai-model">Modello:</label>
+                <select id="ai-model">
+                    <option value="gpt-4">GPT-4</option>
+                    <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                </select>
+            </div>
+
+            <!-- API Key -->
+            <div class="form-group">
+                <label for="api-key">API Key:</label>
+                <input type="password" id="api-key" placeholder="Inserisci la tua API key">
+                <small>Le credenziali sono salvate solo nel tuo browser (LocalStorage)</small>
+            </div>
+
+            <!-- Endpoint personalizzato (visibile solo per Custom) -->
+            <div class="form-group" id="custom-endpoint-group" style="display: none;">
+                <label for="custom-endpoint">Endpoint personalizzato:</label>
+                <input type="text" id="custom-endpoint" placeholder="https://api.example.com/v1/chat/completions">
+            </div>
+
+            <!-- Pulsante salva configurazione -->
+            <button id="save-config" class="btn btn-secondary">💾 Salva Configurazione</button>
+        </div>
+
+        <!-- Generazione Test -->
+        <div class="test-panel">
+            <h2>📝 Genera Test</h2>
+
+            <!-- Materia -->
+            <div class="form-group">
+                <label for="subject">Materia:</label>
+                <select id="subject">
+                    <option value="Funzionario Architetto - Ministero della Cultura">Funzionario Architetto - Ministero della Cultura</option>
+                    <option value="Storia dell'Arte">Storia dell'Arte</option>
+                    <option value="Legislazione dei Beni Culturali">Legislazione dei Beni Culturali</option>
+                    <option value="Restauro e Conservazione">Restauro e Conservazione</option>
+                    <option value="Urbanistica">Urbanistica</option>
+                    <option value="Diritto Amministrativo">Diritto Amministrativo</option>
+                    <option value="custom">Altra materia (personalizzata)</option>
+                </select>
+            </div>
+
+            <!-- Materia personalizzata -->
+            <div class="form-group" id="custom-subject-group" style="display: none;">
+                <label for="custom-subject">Materia personalizzata:</label>
+                <input type="text" id="custom-subject" placeholder="Es: Archeologia medievale">
+            </div>
+
+            <!-- Livello di complessità -->
+            <div class="form-group">
+                <label for="difficulty">Livello di complessità:</label>
+                <select id="difficulty">
+                    <option value="base">Base</option>
+                    <option value="medio">Medio</option>
+                    <option value="avanzato">Avanzato</option>
+                    <option value="tecnico-normativo">Tecnico-Normativo</option>
+                </select>
+            </div>
+
+            <!-- Numero domande -->
+            <div class="form-group">
+                <label for="num-questions">Numero di domande:</label>
+                <input type="number" id="num-questions" min="1" max="50" value="10">
+            </div>
+
+            <!-- Pulsante genera -->
+            <button id="generate-test" class="btn btn-primary">🚀 Genera Test</button>
+
+            <!-- Loading indicator -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Generazione test in corso...</p>
+            </div>
+        </div>
+
+        <!-- Risultati -->
+        <div class="results-panel" id="results-panel" style="display: none;">
+            <h2>📋 Test Generato</h2>
+
+            <!-- Info test -->
+            <div class="test-info" id="test-info"></div>
+
+            <!-- Azioni -->
+            <div class="actions">
+                <button id="export-json" class="btn btn-secondary">📥 Esporta JSON</button>
+                <button id="copy-clipboard" class="btn btn-secondary">📋 Copia negli Appunti</button>
+                <button id="new-test" class="btn btn-secondary">🔄 Nuovo Test</button>
+            </div>
+
+            <!-- Domande -->
+            <div id="questions-container" class="questions-container"></div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Sviluppato con ❤️ per il Ministero della Cultura | Tutte le API key sono gestite localmente</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
